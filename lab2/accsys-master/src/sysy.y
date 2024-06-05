@@ -56,11 +56,11 @@ int syntax_error = 0;
 %type <block_ptr> Block
 %type <blockitem_ptr> BlockItem
 %type <stmt_ptr> Stmt M_Stmt U_Stmt
-%type <lor_ptr> Cond LOrExp LOrExp_Sub
+%type <lor_ptr> Cond LOrExp LOrExp_Sub Exp InitVal
 %type <land_ptr> LAndExp LAndExp_Sub
 %type <eq_ptr> EqExp EqExp_Sub
 %type <rel_ptr> RelExp RelExp_Sub
-%type <addexp_ptr> InitVal Exp AddExp AddExp_Sub
+%type <addexp_ptr> AddExp AddExp_Sub
 %type <mulexp_ptr> MulExp MulExp_Sub
 %type <unaexpr_ptr> UnaryExp
 %type <lval_ptr> LVal
@@ -165,7 +165,7 @@ U_Stmt: IF LP Cond RP Stmt { $$ = new Node_IfStmt($3, $5, nullptr); }
             | WHILE LP Cond RP U_Stmt { $$ = new Node_WhileStmt($3, $5); }
 
 
-Exp: AddExp { $$ = $1; };
+Exp: LOrExp { $$ = $1; };
 
 
 AddExp: MulExp { $$ = new Node_AddExpr(nullptr, OP_None, $1); }

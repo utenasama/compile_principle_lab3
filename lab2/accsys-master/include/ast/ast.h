@@ -162,9 +162,9 @@ struct Node_ValDec : public Node
     constexpr static NodeType this_type = ND_ValDec;
     std::string ID;
     ExpArr_ptr ExpArr;
-    AddExpr_ptr InitVal;
+    LOr_ptr InitVal;
     ValDec_ptr NextValDec; 
-    Node_ValDec(std::string id, ExpArr_ptr exparr, AddExpr_ptr initval, ValDec_ptr valdec_next) : 
+    Node_ValDec(std::string id, ExpArr_ptr exparr, LOr_ptr initval, ValDec_ptr valdec_next) : 
         Node(this_type), ID(id), ExpArr(exparr), InitVal(initval), NextValDec(valdec_next) {}
 };
 
@@ -201,10 +201,10 @@ struct Node_FuncUnaExpr : public Node_UnaExpr
 
 struct Node_FunRParam : public Node
 {
-    AddExpr_ptr FirstParam;
+    LOr_ptr FirstParam;
     FunRParam_ptr NextFunRParam;
     constexpr static NodeType this_type = ND_FunRParam;
-    Node_FunRParam(AddExpr_ptr firstparam, FunRParam_ptr nextfunrparam) : Node(this_type), FirstParam(firstparam), NextFunRParam(nextfunrparam) {}
+    Node_FunRParam(LOr_ptr firstparam, FunRParam_ptr nextfunrparam) : Node(this_type), FirstParam(firstparam), NextFunRParam(nextfunrparam) {}
 };
 
 struct Node_PMNUnaExpr : public Node_UnaExpr
@@ -222,9 +222,9 @@ struct Node_PrimExpr : public Node_UnaExpr
 
 struct Node_LpExprRp : public Node_PrimExpr
 {
-    AddExpr_ptr Operand;
+    LOr_ptr Operand;
     constexpr static NodeType this_type = ND_LpExprRp;
-    Node_LpExprRp(AddExpr_ptr operand) : Node_PrimExpr(this_type), Operand(operand) {}
+    Node_LpExprRp(LOr_ptr operand) : Node_PrimExpr(this_type), Operand(operand) {}
 };
 
 struct Node_Integer : public Node_PrimExpr
@@ -266,9 +266,9 @@ struct Node_FunFParam : public Node
 struct Node_ExpArr : public Node
 {
     constexpr static NodeType this_type = ND_ExpArr;
-    AddExpr_ptr Expr;
+    LOr_ptr Expr;
     ExpArr_ptr NextExpArr;
-    Node_ExpArr(AddExpr_ptr expr, ExpArr_ptr exparr_next) : Node(this_type), Expr(expr), NextExpArr(exparr_next) {}
+    Node_ExpArr(LOr_ptr expr, ExpArr_ptr exparr_next) : Node(this_type), Expr(expr), NextExpArr(exparr_next) {}
 };
 
 struct Node_Block : public Node
@@ -309,22 +309,22 @@ struct Node_LValStmt : public Node_Stmt
 {
     constexpr static NodeType this_type = ND_LValStmt;
     LVal_ptr LVal;
-    AddExpr_ptr Expr;
-    Node_LValStmt(LVal_ptr lval, AddExpr_ptr expr) : Node_Stmt(this_type), LVal(lval), Expr(expr) {} 
+    LOr_ptr Expr;
+    Node_LValStmt(LVal_ptr lval, LOr_ptr expr) : Node_Stmt(this_type), LVal(lval), Expr(expr) {} 
 };
 
 struct Node_RetStmt : public Node_Stmt
 {
     constexpr static NodeType this_type = ND_RetStmt;
-    AddExpr_ptr Expr;
-    Node_RetStmt(AddExpr_ptr expr) : Node_Stmt(this_type), Expr(expr) {}
+    LOr_ptr Expr;
+    Node_RetStmt(LOr_ptr expr) : Node_Stmt(this_type), Expr(expr) {}
 };
 
 struct Node_ExpStmt : public Node_Stmt
 {
     constexpr static NodeType this_type = ND_ExpStmt;
-    AddExpr_ptr Expr;
-    Node_ExpStmt(AddExpr_ptr expr) : Node_Stmt(this_type), Expr(expr) {}
+    LOr_ptr Expr;
+    Node_ExpStmt(LOr_ptr expr) : Node_Stmt(this_type), Expr(expr) {}
 };
 
 struct Node_BreakStmt : public Node_Stmt

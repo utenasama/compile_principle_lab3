@@ -114,7 +114,7 @@ void check_funrparam(FunRParam_ptr funrparam, std::vector<VarType_ptr> funfparam
 {
     // std::cout << funfparam.back()->ValID << std::endl;
     if (funrparam->FirstParam != nullptr) {
-        ResType ret = check_addexp(funrparam->FirstParam);
+        ResType ret = check_lor(funrparam->FirstParam);
         if (ret.RType != Ret_Int || ret.Dimensions != funfparam.back()->Dimensions) {
             error = true;
             fmt::print("Error! Type of function parameters doesn't match\n");
@@ -212,7 +212,7 @@ ResType check_lval(LVal_ptr lval)
     int dimension = var->Dimensions;
     std::vector<int> ret_dim = var->DimensionSizes;
     for (auto p = lval->ExpArr ; p ; p = p->NextExpArr) {
-        ResType ret = check_addexp(p->Expr);
+        ResType ret = check_lor(p->Expr);
         if (ret.RType != RetType::Ret_Int || ret.Dimensions > 0) {
             error = true;
             fmt::print("Error in array definition, type mismatch\n");
@@ -233,7 +233,7 @@ ResType check_prim_unaexpr(PrimExpr_ptr primexp)
     if (primexp->is<Node_LVal>())
         return check_lval(primexp->as<LVal_ptr>());
     else if (primexp->is<Node_LpExprRp>())
-        return check_addexp(primexp->as<LpExprRp_ptr>()->Operand);
+        return check_lor(primexp->as<LpExprRp_ptr>()->Operand);
     else if (primexp->is<Node_Integer>())
         return check_integer(primexp->as<Integer_ptr>());
 }
@@ -337,7 +337,7 @@ void check_exparr(ExpArr_ptr exparrm, int &dimension, std::vector<int> &dim)
     if (exparrm->NextExpArr != nullptr)
         check_exparr(exparrm->NextExpArr, dimension, dim);
     dimension += 1;
-    ResType ret = check_addexp(exparrm->Expr);
+    ResType ret = check_lor(exparrm->Expr);
     if (ret.Value <= 0) {
         error = true;
         fmt::print("Error in array definition, the length of dimension is less than 0\n");
@@ -349,9 +349,9 @@ void check_exparr(ExpArr_ptr exparrm, int &dimension, std::vector<int> &dim)
     }
 }
 
-ResType check_initval(AddExpr_ptr initval)
+ResType check_initval(LOr_ptr initval)
 {
-    return check_addexp(initval);
+    return check_lor(initval);
 }
 
 void check_valdec(ValDec_ptr valdec)
@@ -400,7 +400,7 @@ void check_stmtitem(StmtItem_ptr stmtitem)
 void check_lvalstmt(LValStmt_ptr lvalstmt)
 {
     ResType left = check_lval(lvalstmt->LVal);
-    ResType right = check_addexp(lvalstmt->Expr);
+    ResType right = check_lor(lvalstmt->Expr);
     // std::cout << left.Dimensions << "xx" << std::endl;
     if (left != right || left.RType == Ret_Void || left.Dimensions >=1 || right.Dimensions >= 1) {
         error = true;
@@ -412,7 +412,7 @@ void check_lvalstmt(LValStmt_ptr lvalstmt)
 void check_retstmt(RetStmt_ptr retstmt)
 {
     if (retstmt->Expr != nullptr) {
-        ResType ret = check_addexp(retstmt->Expr);
+        ResType ret = check_lor(retstmt->Expr);
         if (ret != func_call_ret.back()) {
             error = true;
             fmt::print("Error! FuncType return Type mismatch \n");
@@ -425,7 +425,7 @@ void check_retstmt(RetStmt_ptr retstmt)
 }
 
 void check_expstmt(ExpStmt_ptr expstmt) {
-    check_addexp(expstmt->Expr);
+    check_lor(expstmt->Expr);
 }
 
 void check_breakstmt(BreakStmt_ptr breakstmt) {
