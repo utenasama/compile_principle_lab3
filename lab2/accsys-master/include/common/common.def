@@ -1,0 +1,79 @@
+#ifndef TreeNodeDefine
+#define TreeNodeDefine(x)
+#endif
+
+#ifndef OpcodeDefine
+#define OpcodeDefine(x, s)
+#endif
+
+#ifndef RetTypeDefine
+#define RetTypeDefine(x, s)
+#endif
+
+TreeNodeDefine(ND_Integer)
+TreeNodeDefine(ND_TreeRoot)
+TreeNodeDefine(ND_CompUnitValDec)
+TreeNodeDefine(ND_CompUnitFunDec)
+TreeNodeDefine(ND_FunDef)
+TreeNodeDefine(ND_FunFParam)
+TreeNodeDefine(ND_FunUnaExpr)
+TreeNodeDefine(ND_FunRParam)
+
+TreeNodeDefine(ND_Block)
+TreeNodeDefine(ND_BlockStmtItem)
+TreeNodeDefine(ND_BlockValDecItem)
+
+TreeNodeDefine(ND_ValDec)
+TreeNodeDefine(ND_AddExpr)
+TreeNodeDefine(ND_MulExpr)
+TreeNodeDefine(ND_PMNUnaExpr)
+TreeNodeDefine(ND_PrimExpr)
+TreeNodeDefine(ND_LpExprRp)
+TreeNodeDefine(ND_LVal)
+TreeNodeDefine(ND_ExpArr)
+
+TreeNodeDefine(ND_LOr)
+TreeNodeDefine(ND_LAnd)
+TreeNodeDefine(ND_Eq)
+TreeNodeDefine(ND_Rel)
+
+TreeNodeDefine(ND_BlockInStmt)
+TreeNodeDefine(ND_LValStmt)
+TreeNodeDefine(ND_RetStmt)
+TreeNodeDefine(ND_ExpStmt)
+TreeNodeDefine(ND_IfStmt)
+TreeNodeDefine(ND_WhileStmt)
+TreeNodeDefine(ND_ContiStmt)
+TreeNodeDefine(ND_BreakStmt)
+TreeNodeDefine(ND_EmptyStmt)
+
+// Binary Opcode
+OpcodeDefine(OP_Add,    "add")
+OpcodeDefine(OP_Sub,    "sub")
+OpcodeDefine(OP_Mul,    "mul")
+OpcodeDefine(OP_Div,    "div")
+OpcodeDefine(OP_Mod,    "mod")
+OpcodeDefine(OP_Lt,     "lt")
+OpcodeDefine(OP_Gt,     "gt")
+OpcodeDefine(OP_Le,     "le")
+OpcodeDefine(OP_Ge,     "ge")
+OpcodeDefine(OP_Eq,     "eq")
+OpcodeDefine(OP_Ne,     "ne")
+OpcodeDefine(OP_Land,   "and")
+OpcodeDefine(OP_Lor,    "or")
+OpcodeDefine(OP_Lxor,   "xor")
+
+// Unary Opcode
+OpcodeDefine(OP_Lnot,   "not")
+OpcodeDefine(OP_Neg,    "neg")
+
+OpcodeDefine(OP_Pos,    "pos")
+OpcodeDefine(OP_None,    "")  // None
+
+RetTypeDefine(Ret_Int, "int")
+RetTypeDefine(Ret_Void, "void")
+RetTypeDefine(Ret_Error, "Error")
+
+#undef TreeNodeDefine
+#undef OpcodeDefine
+#undef RetTypeDefine
