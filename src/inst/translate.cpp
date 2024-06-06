@@ -16,20 +16,18 @@
 void trans_root(Root_ptr root, std::ostream& out);
 
 extern bool error;
-std::vector<std::map<std::string, VarType_ptr>> scopes_variable_lab3; 
-std::vector<std::map<std::string, FuncType_ptr>> scopes_function_lab3;
+std::vector<std::map<std::string, VarType_ptr>> symbol_table_var_; 
+std::vector<std::map<std::string, FuncType_ptr>> symbol_table_func_;
 //生成module
-auto M = std::make_unique<Module>();
+auto Module_main = std::make_unique<Module>();
 Type *IntegerType = Type::getIntegerTy();
 Type *UnitType = Type::getUnitTy();
 PointerType *PtrIntType = PointerType::get(IntegerType);
 FunctionType *FT_main = FunctionType::get(IntegerType, {});
-Function *F_main = Function::Create(FT_main, false, "main", M.get());
+Function *F_main = Function::Create(FT_main, false, "main", Module_main.get());
 BasicBlock *Entry_main = BasicBlock::Create(F_main);
-//ConstantInt *One = ConstantInt::Create(1);
 ConstantInt *Zero = ConstantInt::Create(0);
-//ConstantInt *Minus_One = ConstantInt::Create(-1);
-BasicBlock *current_bb;
+BasicBlock *current_basic_block;
 
 //用于记录if while的数量，方便block命名
 int if_count = 0;
@@ -55,22 +53,22 @@ Value* trans_lor_sc(LOr_ptr lor, BasicBlock*, BasicBlock*);
 
 void push_scope_lab3()  //加入一个新的作用域
 {
-    scopes_variable_lab3.push_back(std::map<std::string, VarType_ptr>());
-    scopes_function_lab3.push_back(std::map<std::string, FuncType_ptr>());
+    symbol_table_var_.push_back(std::map<std::string, VarType_ptr>());
+    symbol_table_func_.push_back(std::map<std::string, FuncType_ptr>());
 }
 
 void pop_scope_lab3()
 {
     //记得清理new的元素
-    auto scope_var = scopes_variable_lab3.back();
+    auto scope_var = symbol_table_var_.back();
     for(auto &ele : scope_var)
     {
         delete ele.second;
         ele.second = nullptr;
     }
-    scopes_variable_lab3.pop_back();
+    symbol_table_var_.pop_back();
 
-    auto scope_func = scopes_function_lab3.back();
+    auto scope_func = symbol_table_func_.back();
     for(auto &ele : scope_func)
     {   
         //先清理funcptr里面的fparams(这是一个vector<VarType_ptr>)
@@ -82,19 +80,19 @@ void pop_scope_lab3()
         delete ele.second;
         ele.second = nullptr;
     }
-    scopes_function_lab3.pop_back();
+    symbol_table_func_.pop_back();
 }
 
 void add_variable_to_table_lab3(VarType_ptr variableptr)
 {
-    if(scopes_variable_lab3.begin() == scopes_variable_lab3.end())
+    if(symbol_table_var_.begin() == symbol_table_var_.end())
     {
         error = true;
         fmt::print("Error in add_variable_to_table, no scopes\n");
         return;
     }
 
-    auto scope = scopes_variable_lab3.rbegin(); //最后一个scope
+    auto scope = symbol_table_var_.rbegin(); //最后一个scope
     if(scope->find(variableptr->ValID) != scope->end())
     {
         error = true;
@@ -106,15 +104,15 @@ void add_variable_to_table_lab3(VarType_ptr variableptr)
 
 void add_function_to_table_lab3(FuncType_ptr funcptr)
 {
-    if(scopes_function_lab3.begin() == scopes_function_lab3.end())
+    if(symbol_table_func_.begin() == symbol_table_func_.end())
     {
         error = true;
         fmt::print("Error in add_function_to_table, no scopes\n");
         return;
     }
 
-    for(std::vector<std::map<std::string, FuncType_ptr>>::iterator iter = scopes_function_lab3.end()-1; 
-        iter >= scopes_function_lab3.begin(); iter--)
+    for(std::vector<std::map<std::string, FuncType_ptr>>::iterator iter = symbol_table_func_.end()-1; 
+        iter >= symbol_table_func_.begin(); iter--)
     {
         if(iter->find(funcptr->FuncID) != iter->end())
         {
@@ -124,9 +122,9 @@ void add_function_to_table_lab3(FuncType_ptr funcptr)
         }
 
         //没有找到重复的函数定义，可以插入
-        if(iter == scopes_function_lab3.begin())
+        if(iter == symbol_table_func_.begin())
         {
-            auto scope = scopes_function_lab3.rbegin(); //最后一个scope
+            auto scope = symbol_table_func_.rbegin(); //最后一个scope
             scope->insert(std::pair<std::string, FuncType_ptr>(funcptr->FuncID, funcptr));
         }
     }
@@ -150,11 +148,11 @@ Value* trans_pmn_unaexpr(PMNUnaExpr_ptr pmn_unaexp)
     {
         case OP_Lnot:
         {
-            return BinaryInst::CreateEq(res_value, Zero, IntegerType, current_bb);
+            return BinaryInst::CreateEq(res_value, Zero, IntegerType, current_basic_block);
         }
         case OP_Neg:
         {
-            return BinaryInst::CreateSub(Zero, res_value, IntegerType, current_bb);
+            return BinaryInst::CreateSub(Zero, res_value, IntegerType, current_basic_block);
         }
         case OP_Pos:
         {
@@ -174,8 +172,8 @@ Value* trans_func_unaexpr(FunUnaExpr_ptr func_unaexpr)
     assert(func_unaexpr != nullptr);
     std::vector<Value*> args;
     //先检查函数是否定义，再检查参数
-    for(std::vector<std::map<std::string, FuncType_ptr>>::iterator iter = scopes_function_lab3.end()-1; 
-        iter >= scopes_function_lab3.begin(); iter--)
+    for(std::vector<std::map<std::string, FuncType_ptr>>::iterator iter = symbol_table_func_.end()-1; 
+        iter >= symbol_table_func_.begin(); iter--)
     {
         auto map_iter = iter->find(func_unaexpr->FunID);
         if(map_iter != iter->end())
@@ -189,12 +187,12 @@ Value* trans_func_unaexpr(FunUnaExpr_ptr func_unaexpr)
             }
 
             //生成一条Call语句
-            CallInst *Call = CallInst::Create(funcptr->F, args, current_bb);
+            CallInst *Call = CallInst::Create(funcptr->F, args, current_basic_block);
             return Call;
         }
 
         //没有找到
-        if(iter == scopes_function_lab3.begin())
+        if(iter == symbol_table_func_.begin())
         {
             error = true;
             fmt::print("Error in trans_func_unaexpr, \"{}\" not defined\n", func_unaexpr->FunID);
@@ -230,8 +228,8 @@ Value* trans_lval(LVal_ptr lval)
         }
     }
     
-    for(std::vector<std::map<std::string, VarType_ptr>>::iterator iter = scopes_variable_lab3.end()-1; 
-        iter >= scopes_variable_lab3.begin(); iter--)
+    for(std::vector<std::map<std::string, VarType_ptr>>::iterator iter = symbol_table_var_.end()-1; 
+        iter >= symbol_table_var_.begin(); iter--)
     {
         auto map_iter = iter->find(lval->ID);
         if(map_iter != iter->end())
@@ -252,22 +250,22 @@ Value* trans_lval(LVal_ptr lval)
                 OffsetInst *Offset;
 
                 if(valptr->Val_Ptr == nullptr)  //Value是nullptr，说明这是一个形参，需要用getarg获得实参
-                    Offset = OffsetInst::Create(IntegerType, current_bb->getParent()->getArg(valptr->Param_No), Indices, valptr->Bounds, current_bb);
+                    Offset = OffsetInst::Create(IntegerType, current_basic_block->getParent()->getArg(valptr->Param_No), Indices, valptr->Bounds, current_basic_block);
                 else
-                    Offset = OffsetInst::Create(IntegerType, valptr->Val_Ptr, Indices, valptr->Bounds,current_bb);
+                    Offset = OffsetInst::Create(IntegerType, valptr->Val_Ptr, Indices, valptr->Bounds,current_basic_block);
                 
                 if(!need_load)
                     return Offset;
                 else
-                    return LoadInst::Create(Offset, current_bb);
+                    return LoadInst::Create(Offset, current_basic_block);
             }
             else{
-                return LoadInst::Create(valptr->Val_Ptr, current_bb);
+                return LoadInst::Create(valptr->Val_Ptr, current_basic_block);
             }
         }
 
         //没有找到
-        if(iter == scopes_variable_lab3.begin())
+        if(iter == symbol_table_var_.begin())
         {
             error = true;
             fmt::print("Error in trans_lval, \"{}\" not defined\n", lval->ID);
@@ -297,8 +295,8 @@ Value* trans_lval_noload(LVal_ptr lval)
         }
     }
     
-    for(std::vector<std::map<std::string, VarType_ptr>>::iterator iter = scopes_variable_lab3.end()-1; 
-        iter >= scopes_variable_lab3.begin(); iter--)
+    for(std::vector<std::map<std::string, VarType_ptr>>::iterator iter = symbol_table_var_.end()-1; 
+        iter >= symbol_table_var_.begin(); iter--)
     {
         auto map_iter = iter->find(lval->ID);
         if(map_iter != iter->end())
@@ -316,9 +314,9 @@ Value* trans_lval_noload(LVal_ptr lval)
             if(dimensions != 0){
                 OffsetInst *Offset;
                 if(valptr->Val_Ptr == nullptr)  //Value是nullptr，说明这是一个形参，需要用getarg获得实参
-                    Offset = OffsetInst::Create(IntegerType, current_bb->getParent()->getArg(valptr->Param_No), Indices, valptr->Bounds, current_bb);
+                    Offset = OffsetInst::Create(IntegerType, current_basic_block->getParent()->getArg(valptr->Param_No), Indices, valptr->Bounds, current_basic_block);
                 else
-                    Offset = OffsetInst::Create(IntegerType, valptr->Val_Ptr, Indices, valptr->Bounds,current_bb);
+                    Offset = OffsetInst::Create(IntegerType, valptr->Val_Ptr, Indices, valptr->Bounds,current_basic_block);
                 
                 return Offset;
             }
@@ -328,7 +326,7 @@ Value* trans_lval_noload(LVal_ptr lval)
         }
 
         //没有找到
-        if(iter == scopes_variable_lab3.begin())
+        if(iter == symbol_table_var_.begin())
         {
             error = true;
             fmt::print("Error in trans_lval, \"{}\" not defined\n", lval->ID);
@@ -383,15 +381,15 @@ Value* trans_mulexp(MulExpr_ptr mulexp)
         Value* res_val2 = trans_unaexp(mulexp->UnaExpr);
 
         if(mulexp->OP == OP_Mul){
-            BinaryInst *Mul = BinaryInst::CreateMul(res_val1, res_val2, IntegerType, current_bb);
+            BinaryInst *Mul = BinaryInst::CreateMul(res_val1, res_val2, IntegerType, current_basic_block);
             return Mul;
         }
         else if(mulexp->OP == OP_Div){
-            BinaryInst *Div = BinaryInst::CreateDiv(res_val1, res_val2, IntegerType, current_bb);
+            BinaryInst *Div = BinaryInst::CreateDiv(res_val1, res_val2, IntegerType, current_basic_block);
             return Div;
         }
         else if(mulexp->OP == OP_Mod){
-            BinaryInst *Mod = BinaryInst::CreateMod(res_val1, res_val2, IntegerType, current_bb);
+            BinaryInst *Mod = BinaryInst::CreateMod(res_val1, res_val2, IntegerType, current_basic_block);
             return Mod;
         }
         else{
@@ -412,11 +410,11 @@ Value* trans_addexp(AddExpr_ptr addexp)
         Value* res_val2 = trans_mulexp(addexp->MulExpr);
         
         if(addexp->OP == OP_Add){
-            BinaryInst *Add = BinaryInst::CreateAdd(res_val1, res_val2, IntegerType, current_bb);
+            BinaryInst *Add = BinaryInst::CreateAdd(res_val1, res_val2, IntegerType, current_basic_block);
             return Add;
         }
         else if(addexp->OP == OP_Sub){
-            BinaryInst *Sub = BinaryInst::CreateSub(res_val1, res_val2, IntegerType, current_bb);
+            BinaryInst *Sub = BinaryInst::CreateSub(res_val1, res_val2, IntegerType, current_basic_block);
             return Sub;
         }
         else{
@@ -469,7 +467,7 @@ void trans_valdec(ValDec_ptr valdec)
     }
 
     //变量alloca指令
-    AllocaInst *ValAddr = AllocaInst::Create(IntegerType, element_len, current_bb);
+    AllocaInst *ValAddr = AllocaInst::Create(IntegerType, element_len, current_basic_block);
 
     if(valdec->InitVal != nullptr)
     {
@@ -479,7 +477,7 @@ void trans_valdec(ValDec_ptr valdec)
             fmt::print("error in initialization: array can not be initialized!\n");
         }
         Value *init_val = trans_initval(valdec->InitVal);
-        StoreInst *ValInit = StoreInst::Create(init_val, ValAddr, current_bb);
+        StoreInst *ValInit = StoreInst::Create(init_val, ValAddr, current_basic_block);
     }
 
     auto *variable = new VarType(valdec->ID, dimensions, dim_vec, ValAddr);
@@ -512,7 +510,7 @@ void trans_valdec_global(ValDec_ptr valdec)
 
     //变量alloca指令
 
-    auto ValAddr = GlobalVariable::Create(IntegerType, element_len, false, valdec->ID, M.get());  
+    auto ValAddr = GlobalVariable::Create(IntegerType, element_len, false, valdec->ID, Module_main.get());  
     if(valdec->InitVal != nullptr)
     {
         if(valdec->ExpArr != nullptr)  //lab为了简化，不支持数组初始化
@@ -590,7 +588,7 @@ void trans_lvalstmt(LValStmt_ptr lvalstmt)
     Value* res_value1 = trans_lval_noload(lvalstmt->LVal);
     Value* res_value2 = trans_lor(lvalstmt->Expr);
 
-   StoreInst *ResStore = StoreInst::Create(res_value2, res_value1, current_bb);
+   StoreInst *ResStore = StoreInst::Create(res_value2, res_value1, current_basic_block);
 }
 
 void trans_retstmt(RetStmt_ptr retstmt)
@@ -600,11 +598,11 @@ void trans_retstmt(RetStmt_ptr retstmt)
     if(retstmt->Expr != nullptr)
     {
         Value* res_value = trans_lor(retstmt->Expr);
-        RetInst *Ret = RetInst::Create(res_value,current_bb);
+        RetInst *Ret = RetInst::Create(res_value,current_basic_block);
         cur_bb_has_term = true;
     }else{
         Value *V = ConstantUnit::Create();
-        RetInst *Ret = RetInst::Create(V,current_bb);
+        RetInst *Ret = RetInst::Create(V,current_basic_block);
         cur_bb_has_term = true;
     }
 }
@@ -626,7 +624,7 @@ void trans_breakstmt(BreakStmt_ptr breakstmt, BasicBlock *exit)
         return;
     }
     if(!cur_bb_has_term){
-        JumpInst *JFE = JumpInst::Create(exit, current_bb);
+        JumpInst *JFE = JumpInst::Create(exit, current_basic_block);
         cur_bb_has_term = true;
     }
 }
@@ -640,7 +638,7 @@ void trans_contistmt(ContiStmt_ptr contistmt, BasicBlock *entry)
         return;
     }
     if(!cur_bb_has_term){
-        JumpInst *JFE = JumpInst::Create(entry, current_bb);
+        JumpInst *JFE = JumpInst::Create(entry, current_basic_block);
         cur_bb_has_term = true;
     }
 }
@@ -663,7 +661,7 @@ Value* trans_lor(LOr_ptr lor)
     {
         Value* res_val1 = trans_land(lor->LAnd);
         Value* res_val2 = trans_lor(lor->Operand);
-        BinaryInst *Lor = BinaryInst::CreateOr(res_val1, res_val2, IntegerType, current_bb);
+        BinaryInst *Lor = BinaryInst::CreateOr(res_val1, res_val2, IntegerType, current_basic_block);
         return Lor;
     }else{
         return trans_land(lor->LAnd);
@@ -678,7 +676,7 @@ Value* trans_land(LAnd_ptr land)
     {
         Value* res_val1 = trans_eq(land->Eq);
         Value* res_val2 = trans_land(land->Operand);
-        BinaryInst *Land = BinaryInst::CreateAnd(res_val1, res_val2, IntegerType, current_bb);
+        BinaryInst *Land = BinaryInst::CreateAnd(res_val1, res_val2, IntegerType, current_basic_block);
         return Land;
     }else{
         return trans_eq(land->Eq);
@@ -692,10 +690,10 @@ Value* trans_lor_sc(LOr_ptr lor, BasicBlock *true_bb, BasicBlock *false_bb)
     assert(lor != nullptr);
     if(lor->Operand != nullptr)
     {
-        BasicBlock *lor_con1_false_bb = BasicBlock::Create(current_bb->getParent());
+        BasicBlock *lor_con1_false_bb = BasicBlock::Create(current_basic_block->getParent());
         Value* res_val1 = trans_land_sc(lor->LAnd, true_bb, lor_con1_false_bb);
         //左边是false，就进入到lor语句的右部分block
-        current_bb = lor_con1_false_bb;
+        current_basic_block = lor_con1_false_bb;
         lor_count++;
         cur_bb_has_term = false;
         block_count++;
@@ -712,19 +710,19 @@ Value* trans_land_sc(LAnd_ptr land, BasicBlock *true_bb, BasicBlock *false_bb)
     assert(land != nullptr);
     if(land->Operand != nullptr)
     {
-        BasicBlock *land_con1_true_bb = BasicBlock::Create(current_bb->getParent());
+        BasicBlock *land_con1_true_bb = BasicBlock::Create(current_basic_block->getParent());
         Value* res_val1 = trans_eq(land->Eq);
-        BranchInst *Br = BranchInst::Create(land_con1_true_bb, false_bb, res_val1, current_bb);
+        BranchInst *Br = BranchInst::Create(land_con1_true_bb, false_bb, res_val1, current_basic_block);
 
         //左边是true，就进入到land语句的右部分block
-        current_bb = land_con1_true_bb;
+        current_basic_block = land_con1_true_bb;
         land_count++;
 
         cur_bb_has_term = false;
         block_count++;
 
         Value* res_val2 = trans_land_sc(land->Operand, true_bb, false_bb);
-        //BinaryInst *Land = BinaryInst::CreateAnd(res_val1, res_val2, IntegerType, current_bb);
+        //BinaryInst *Land = BinaryInst::CreateAnd(res_val1, res_val2, IntegerType, current_basic_block);
         return res_val2;
     }else{
         //如果这个land表达式没有operand，还有一种特殊情况，就是带有()的表达式，比如if((a>1 || b<1))，这种括号表达式在if/while内也要shortcut
@@ -740,7 +738,7 @@ Value* trans_land_sc(LAnd_ptr land, BasicBlock *true_bb, BasicBlock *false_bb)
         }
 
         Value* res_value = trans_eq(land->Eq);
-        BranchInst *Br = BranchInst::Create(true_bb, false_bb, res_value, current_bb);
+        BranchInst *Br = BranchInst::Create(true_bb, false_bb, res_value, current_basic_block);
         return res_value;
     }
 }
@@ -756,9 +754,9 @@ Value* trans_eq(Eq_ptr eq)
         Value* res_val2 = trans_rel(eq->Rel);
      
         if(eq->OP == OP_Eq)
-            return BinaryInst::CreateEq(res_val1, res_val2, IntegerType, current_bb);
+            return BinaryInst::CreateEq(res_val1, res_val2, IntegerType, current_basic_block);
         else if(eq->OP == OP_Ne)
-            return BinaryInst::CreateNe(res_val1, res_val2, IntegerType, current_bb);
+            return BinaryInst::CreateNe(res_val1, res_val2, IntegerType, current_basic_block);
         else{
             error = true;
             fmt::print("Error in trans_eq, operand should be Eq / Ne!!\n");
@@ -777,13 +775,13 @@ Value* trans_rel(Rel_ptr rel)
         Value* res_val2 = trans_addexp(rel->Expr);
 
         if(rel->OP == OP_Lt)
-            return BinaryInst::CreateLt(res_val1, res_val2, IntegerType, current_bb);
+            return BinaryInst::CreateLt(res_val1, res_val2, IntegerType, current_basic_block);
         else if(rel->OP == OP_Gt)
-            return BinaryInst::CreateGt(res_val1, res_val2, IntegerType, current_bb);
+            return BinaryInst::CreateGt(res_val1, res_val2, IntegerType, current_basic_block);
         else if(rel->OP == OP_Le)
-            return BinaryInst::CreateLe(res_val1, res_val2, IntegerType, current_bb);
+            return BinaryInst::CreateLe(res_val1, res_val2, IntegerType, current_basic_block);
         else if(rel->OP == OP_Ge)
-            return BinaryInst::CreateGe(res_val1, res_val2, IntegerType, current_bb);
+            return BinaryInst::CreateGe(res_val1, res_val2, IntegerType, current_basic_block);
         else{
             error = true;
             fmt::print("Error in trans_rel, operand should be Lt / Gt / Le / Ge!!\n");
@@ -802,34 +800,34 @@ void trans_whilestmt(WhileStmt_ptr whilestmt)
     lor_count = 0;
     land_count = 0;
 
-    BasicBlock *Body = BasicBlock::Create(current_bb->getParent());
-    BasicBlock *Entry = BasicBlock::Create(current_bb->getParent());
-    BasicBlock *Exit = BasicBlock::Create(current_bb->getParent());
+    BasicBlock *Body = BasicBlock::Create(current_basic_block->getParent());
+    BasicBlock *Entry = BasicBlock::Create(current_basic_block->getParent());
+    BasicBlock *Exit = BasicBlock::Create(current_basic_block->getParent());
 
     //先插入一条jump到当前block，跳转到entry
     if(!cur_bb_has_term){
-        JumpInst *JTE = JumpInst::Create(Entry, current_bb);
+        JumpInst *JTE = JumpInst::Create(Entry, current_basic_block);
         cur_bb_has_term = true;
     }
 
     //下面开始翻译
-    current_bb = Entry;
+    current_basic_block = Entry;
     cur_bb_has_term = false;
     block_count++;
 
     Value* res_value = trans_lor_sc(whilestmt->Cond, Body, Exit);  //如果不等于0，就是true
 
-    current_bb = Body;
+    current_basic_block = Body;
     cur_bb_has_term = false;
     block_count++;
     trans_stmt(whilestmt->WhileBody, Entry, Exit);
     if(!cur_bb_has_term)
     {
-        JumpInst *JTE2 = JumpInst::Create(Entry, current_bb);
+        JumpInst *JTE2 = JumpInst::Create(Entry, current_basic_block);
         cur_bb_has_term = true;
     }
 
-    current_bb = Exit;
+    current_basic_block = Exit;
     cur_bb_has_term = false;
     block_count++;
 }
@@ -842,12 +840,12 @@ void trans_ifstmt(IfStmt_ptr ifstmt, BasicBlock *entry, BasicBlock *exit)
     lor_count = 0;
     land_count = 0;
     
-    BasicBlock *True = BasicBlock::Create(current_bb->getParent());
+    BasicBlock *True = BasicBlock::Create(current_basic_block->getParent());
     BasicBlock *False = nullptr;
     if(ifstmt->ElseBody != nullptr){
-        False = BasicBlock::Create(current_bb->getParent());
+        False = BasicBlock::Create(current_basic_block->getParent());
     }
-    BasicBlock *Exit_If = BasicBlock::Create(current_bb->getParent());
+    BasicBlock *Exit_If = BasicBlock::Create(current_basic_block->getParent());
 
     //下面开始翻译
     if(ifstmt->ElseBody != nullptr)
@@ -856,33 +854,33 @@ void trans_ifstmt(IfStmt_ptr ifstmt, BasicBlock *entry, BasicBlock *exit)
         Value* res_value = trans_lor_sc(ifstmt->Cond, True, Exit_If);
     if(ifstmt->ElseBody != nullptr)
     {   
-        current_bb = True;
+        current_basic_block = True;
         cur_bb_has_term = false;
         block_count++;
         trans_stmt(ifstmt->IfBody, entry, exit);
         if(!cur_bb_has_term){
-            JumpInst::Create(Exit_If, current_bb);
+            JumpInst::Create(Exit_If, current_basic_block);
             cur_bb_has_term = true;
         }
-        current_bb = False;
+        current_basic_block = False;
         cur_bb_has_term = false;
         block_count++;
         trans_stmt(ifstmt->ElseBody, entry, exit);
         if(!cur_bb_has_term){
-            JumpInst::Create(Exit_If, current_bb);
+            JumpInst::Create(Exit_If, current_basic_block);
             cur_bb_has_term = true;
         }
     }else{
-        current_bb = True;
+        current_basic_block = True;
         cur_bb_has_term = false;
         block_count++;
         trans_stmt(ifstmt->IfBody, entry, exit);
         if(!cur_bb_has_term){
-            JumpInst::Create(Exit_If, current_bb);
+            JumpInst::Create(Exit_If, current_basic_block);
             cur_bb_has_term = true;
         }
     }
-    current_bb = Exit_If;
+    current_basic_block = Exit_If;
     cur_bb_has_term = false;
     block_count++;
 }
@@ -977,7 +975,7 @@ void trans_fundec_lab3(FunDef_ptr fundef)
     Function *F;
     if(fundef->FunID != "main"){
         FunctionType *FT = FunctionType::get(ret_type, Params_lab3);
-        F = Function::Create(FT, false, fundef->FunID, M.get());
+        F = Function::Create(FT, false, fundef->FunID, Module_main.get());
         Entry = BasicBlock::Create(F);
     }else{
         F = F_main;
@@ -989,7 +987,7 @@ void trans_fundec_lab3(FunDef_ptr fundef)
 
     //新加入一个scope，也就是函数的作用域
     push_scope_lab3();
-    current_bb = Entry;
+    current_basic_block = Entry;
     cur_bb_has_term = false;
     block_count++;
     //函数的参数属于自己的那个作用域，顺便为所有形参加上名字
@@ -999,9 +997,9 @@ void trans_fundec_lab3(FunDef_ptr fundef)
         Value *val_ptr = nullptr;
         if(ele->Dimensions == 0)
         {
-            AllocaInst *Val_Addr = AllocaInst::Create(IntegerType, 1, current_bb);
+            AllocaInst *Val_Addr = AllocaInst::Create(IntegerType, 1, current_basic_block);
 
-            StoreInst *NArgStore = StoreInst::Create(current_bb->getParent()->getArg(count), Val_Addr, current_bb);
+            StoreInst *NArgStore = StoreInst::Create(current_basic_block->getParent()->getArg(count), Val_Addr, current_basic_block);
             val_ptr = Val_Addr;           
         }
         auto *param = new VarType(ele->ValID, ele->Dimensions, ele->DimensionSizes,val_ptr, count); //这里改成拷贝构造函数可能更好
@@ -1075,10 +1073,10 @@ void trans_root(Root_ptr root, std::ostream & out)
     push_scope_lab3();
 
     //加入运行时函数到最外层作用域之中
-    auto scope = scopes_function_lab3.begin();
+    auto scope = symbol_table_func_.begin();
     //putint
     FunctionType *FT_putint = FunctionType::get(UnitType, {IntegerType});
-    Function *F_putint = Function::Create(FT_putint, true, "putint", M.get());
+    Function *F_putint = Function::Create(FT_putint, true, "putint", Module_main.get());
     std::vector<VarType_ptr> params_putint;
     auto param_putint = new VarType("value", 0, {}); //这里因为不会编译putint的函数定义，所以形参叫什么都无所谓
     params_putint.push_back(param_putint);
@@ -1087,13 +1085,13 @@ void trans_root(Root_ptr root, std::ostream & out)
 
     //getint
     FunctionType *FT_getint = FunctionType::get(IntegerType, {});
-    Function *F_getint = Function::Create(FT_getint, true, "getint", M.get());
+    Function *F_getint = Function::Create(FT_getint, true, "getint", Module_main.get());
     scope->insert(std::pair<std::string, FuncType_ptr>("getint", 
                         new FuncType("getint", Ret_Int, std::vector<VarType_ptr>(), F_getint)));
 
     //putch
     FunctionType *FT_putch = FunctionType::get(UnitType, {IntegerType});
-    Function *F_putch = Function::Create(FT_putch, true, "putch", M.get());
+    Function *F_putch = Function::Create(FT_putch, true, "putch", Module_main.get());
     std::vector<VarType_ptr> params_putch;
     auto param_putch = new VarType("value", 0, {}); //这里因为不会编译putint的函数定义，所以形参叫什么都无所谓
     params_putch.push_back(param_putch);
@@ -1102,25 +1100,25 @@ void trans_root(Root_ptr root, std::ostream & out)
     
     //getch
     FunctionType *FT_getch = FunctionType::get(IntegerType, {});
-    Function *F_getch = Function::Create(FT_getch, true, "getch", M.get());
+    Function *F_getch = Function::Create(FT_getch, true, "getch", Module_main.get());
     scope->insert(std::pair<std::string, FuncType_ptr>("getch", 
                         new FuncType("getch", Ret_Int, std::vector<VarType_ptr>(), F_getch)));
     
     //starttime
     FunctionType *FT_starttime = FunctionType::get(UnitType, {});
-    Function *F_starttime = Function::Create(FT_starttime, true, "starttime", M.get());
+    Function *F_starttime = Function::Create(FT_starttime, true, "starttime", Module_main.get());
     scope->insert(std::pair<std::string, FuncType_ptr>("starttime", 
                         new FuncType("starttime", Ret_Void, std::vector<VarType_ptr>(), F_starttime)));
 
     //stoptime
     FunctionType *FT_stoptime = FunctionType::get(UnitType, {});
-    Function *F_stoptime = Function::Create(FT_stoptime, true, "stoptime", M.get());
+    Function *F_stoptime = Function::Create(FT_stoptime, true, "stoptime", Module_main.get());
     scope->insert(std::pair<std::string, FuncType_ptr>("stoptime", 
                         new FuncType("stoptime", Ret_Void, std::vector<VarType_ptr>(), F_stoptime)));
 
     //getarray
     FunctionType *FT_getarray = FunctionType::get(IntegerType, {PtrIntType});
-    Function *F_getarray = Function::Create(FT_getarray, true, "getarray", M.get());
+    Function *F_getarray = Function::Create(FT_getarray, true, "getarray", Module_main.get());
     std::vector<VarType_ptr> params_getarray;
     auto param_getarray = new VarType("value", 1, std::vector({0})); //这里因为不会编译putint的函数定义，所以形参叫什么都无所谓
     params_getarray.push_back(param_getarray);
@@ -1129,7 +1127,7 @@ void trans_root(Root_ptr root, std::ostream & out)
 
     //putarray
     FunctionType *FT_putarray = FunctionType::get(UnitType, {IntegerType, PtrIntType});
-    Function *F_putarray = Function::Create(FT_putarray, true, "putarray", M.get());
+    Function *F_putarray = Function::Create(FT_putarray, true, "putarray", Module_main.get());
     std::vector<VarType_ptr> params_putarray;
     auto param1_putarray = new VarType("value", 0, {});
     auto param2_putarray = new VarType("value", 1, std::vector({0})); //这里因为不会编译putint的函数定义，所以形参叫什么都无所谓
@@ -1140,5 +1138,5 @@ void trans_root(Root_ptr root, std::ostream & out)
 
     if(root->CompUnitHead != nullptr)
         trans_compunit(root->CompUnitHead);
-    M->print(out, false);
+    Module_main->print(out, false);
 }
