@@ -26,3 +26,6 @@ Value* trans_land(LAnd_ptr land);
 Value* trans_lor(LOr_ptr lor);
 Value* trans_land_shortcut(LAnd_ptr land, BasicBlock *, BasicBlock*);
 Value* trans_lor_shortcut(LOr_ptr lor, BasicBlock*, BasicBlock*);
+void trans_stmt_block(BasicBlock *block, Stmt_ptr stmt, BasicBlock *exit, BasicBlock *entry, BasicBlock *exit_stmt);
+void trans_params(FunDef_ptr fundef, std::vector<VarType_ptr>& params, std::vector<Type *>& Params_lab3);
+void handle_param(VarType_ptr ele, int count);

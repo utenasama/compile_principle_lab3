@@ -35,8 +35,8 @@
    especially those whose name start with YY_ or yy_.  They are
    private implementation details that can be changed or removed.  */
 
-#ifndef YY_YY_HOME_UTENA_LAB3_FINAL_COMPILE_PRINCIPLE_LAB3_BUILD_SYSY_TAB_HH_INCLUDED
-# define YY_YY_HOME_UTENA_LAB3_FINAL_COMPILE_PRINCIPLE_LAB3_BUILD_SYSY_TAB_HH_INCLUDED
+#ifndef YY_YY_HOME_KAILL_DESKTOP_LAB3_COMPILE_PRINCIPLE_LAB3_BUILD_SYSY_TAB_HH_INCLUDED
+# define YY_YY_HOME_KAILL_DESKTOP_LAB3_COMPILE_PRINCIPLE_LAB3_BUILD_SYSY_TAB_HH_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -95,7 +95,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 24 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 24 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
 
       int int_Val;
       char* str_Val;
@@ -120,7 +120,7 @@ union YYSTYPE
       Eq_ptr eq_ptr;
       Rel_ptr rel_ptr; 
 
-#line 124 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.hh"
+#line 124 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.hh"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -135,4 +135,4 @@ extern YYSTYPE yylval;
 int yyparse (void);
 
 
-#endif /* !YY_YY_HOME_UTENA_LAB3_FINAL_COMPILE_PRINCIPLE_LAB3_BUILD_SYSY_TAB_HH_INCLUDED  */
+#endif /* !YY_YY_HOME_KAILL_DESKTOP_LAB3_COMPILE_PRINCIPLE_LAB3_BUILD_SYSY_TAB_HH_INCLUDED  */

@@ -67,7 +67,7 @@
 
 
 /* First part of user prologue.  */
-#line 3 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 3 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
 
 #include <ast/ast.h>
 #include <stdio.h>
@@ -86,7 +86,7 @@ extern bool error;
 void yyerror(const char *s);
 int syntax_error = 0;
 
-#line 90 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 90 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -1500,457 +1500,457 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* Root: CompUnit  */
-#line 85 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 85 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                { root = new TreeRoot((yyvsp[0].compunit_ptr)); }
-#line 1506 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1506 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 3: /* CompUnit: VarDecl  */
-#line 92 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 92 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                   { (yyval.compunit_ptr) = new Node_CompUnitValDec((yyvsp[0].valdec_ptr), nullptr); }
-#line 1512 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1512 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 4: /* CompUnit: FuncDef  */
-#line 93 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 93 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                   { (yyval.compunit_ptr) = new Node_CompUnitFunDec((yyvsp[0].fundef_ptr), nullptr); }
-#line 1518 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1518 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 5: /* CompUnit: VarDecl CompUnit  */
-#line 94 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 94 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                            { (yyval.compunit_ptr) = new Node_CompUnitValDec((yyvsp[-1].valdec_ptr), (yyvsp[0].compunit_ptr)); }
-#line 1524 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1524 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 6: /* CompUnit: FuncDef CompUnit  */
-#line 95 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 95 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                            { (yyval.compunit_ptr) = new Node_CompUnitFunDec((yyvsp[-1].fundef_ptr), (yyvsp[0].compunit_ptr)); }
-#line 1530 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1530 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 7: /* VarDecl: INT VarDef SEMICOLON  */
-#line 98 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 98 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                               { (yyval.valdec_ptr) = (yyvsp[-1].valdec_ptr); }
-#line 1536 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1536 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 8: /* VarDef: ID ExpArray  */
-#line 100 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 100 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                     { (yyval.valdec_ptr) = new Node_ValDec((yyvsp[-1].str_Val), (yyvsp[0].exparr_ptr), nullptr, nullptr); }
-#line 1542 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1542 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 9: /* VarDef: ID ExpArray ASSIGN InitVal  */
-#line 101 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 101 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                          { (yyval.valdec_ptr) = new Node_ValDec((yyvsp[-3].str_Val), (yyvsp[-2].exparr_ptr), (yyvsp[0].lor_ptr), nullptr); }
-#line 1548 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1548 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 10: /* VarDef: ID ExpArray ASSIGN InitVal COMMA VarDef  */
-#line 102 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 102 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                                       { (yyval.valdec_ptr) = new Node_ValDec((yyvsp[-5].str_Val), (yyvsp[-4].exparr_ptr), (yyvsp[-2].lor_ptr), (yyvsp[0].valdec_ptr)); }
-#line 1554 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1554 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 11: /* VarDef: ID ExpArray COMMA VarDef  */
-#line 103 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 103 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                        { (yyval.valdec_ptr) = new Node_ValDec((yyvsp[-3].str_Val), (yyvsp[-2].exparr_ptr), nullptr, (yyvsp[0].valdec_ptr)); }
-#line 1560 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1560 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 12: /* InitVal: Exp  */
-#line 106 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 106 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
              { (yyval.lor_ptr) = (yyvsp[0].lor_ptr); }
-#line 1566 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1566 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 13: /* Cond: LOrExp  */
-#line 108 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 108 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
              { (yyval.lor_ptr) = (yyvsp[0].lor_ptr); }
-#line 1572 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1572 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 14: /* LOrExp: LAndExp LOrExp_Sub  */
-#line 110 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 110 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                            { (yyval.lor_ptr) = new Node_LOr((yyvsp[0].lor_ptr), (yyvsp[-1].land_ptr)); }
-#line 1578 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1578 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 15: /* LOrExp_Sub: L_OR LAndExp LOrExp_Sub  */
-#line 111 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 111 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                     { (yyval.lor_ptr) = new Node_LOr((yyvsp[0].lor_ptr), (yyvsp[-1].land_ptr)); }
-#line 1584 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1584 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 16: /* LOrExp_Sub: %empty  */
-#line 112 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 112 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                     { (yyval.lor_ptr) = nullptr; }
-#line 1590 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1590 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 17: /* LAndExp: EqExp LAndExp_Sub  */
-#line 118 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 118 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                            { (yyval.land_ptr) = new Node_LAnd((yyvsp[0].land_ptr), (yyvsp[-1].eq_ptr)); }
-#line 1596 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1596 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 18: /* LAndExp_Sub: L_AND EqExp LAndExp_Sub  */
-#line 119 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 119 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                      { (yyval.land_ptr) = new Node_LAnd((yyvsp[0].land_ptr), (yyvsp[-1].eq_ptr)); }
-#line 1602 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1602 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 19: /* LAndExp_Sub: %empty  */
-#line 120 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 120 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
               { (yyval.land_ptr) = nullptr; }
-#line 1608 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1608 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 20: /* EqExp: RelExp  */
-#line 131 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 131 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
               { (yyval.eq_ptr) = new Node_Eq(nullptr, OP_None, (yyvsp[0].rel_ptr)); }
-#line 1614 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1614 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 21: /* EqExp: EqExp L_EQUAL RelExp  */
-#line 132 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 132 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                    { (yyval.eq_ptr) = new Node_Eq((yyvsp[-2].eq_ptr), OP_Eq, (yyvsp[0].rel_ptr)); }
-#line 1620 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1620 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 22: /* EqExp: EqExp NE RelExp  */
-#line 133 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 133 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                               { (yyval.eq_ptr) = new Node_Eq((yyvsp[-2].eq_ptr), OP_Ne, (yyvsp[0].rel_ptr)); }
-#line 1626 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1626 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 23: /* RelExp: RelExp LT AddExp  */
-#line 142 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 142 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                           { (yyval.rel_ptr) = new Node_Rel((yyvsp[-2].rel_ptr), OP_Lt, (yyvsp[0].addexp_ptr)); }
-#line 1632 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1632 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 24: /* RelExp: RelExp LE AddExp  */
-#line 143 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 143 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                { (yyval.rel_ptr) = new Node_Rel((yyvsp[-2].rel_ptr), OP_Le, (yyvsp[0].addexp_ptr)); }
-#line 1638 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1638 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 25: /* RelExp: RelExp GT AddExp  */
-#line 144 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 144 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                { (yyval.rel_ptr) = new Node_Rel((yyvsp[-2].rel_ptr), OP_Gt, (yyvsp[0].addexp_ptr)); }
-#line 1644 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1644 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 26: /* RelExp: RelExp GE AddExp  */
-#line 145 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 145 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                { (yyval.rel_ptr) = new Node_Rel((yyvsp[-2].rel_ptr), OP_Ge, (yyvsp[0].addexp_ptr)); }
-#line 1650 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1650 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 27: /* RelExp: AddExp  */
-#line 146 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 146 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                      { (yyval.rel_ptr) = new Node_Rel(nullptr, OP_None, (yyvsp[0].addexp_ptr)); }
-#line 1656 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1656 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 28: /* Stmt: M_Stmt  */
-#line 148 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 148 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
              { (yyval.stmt_ptr) = (yyvsp[0].stmt_ptr); }
-#line 1662 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1662 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 29: /* Stmt: U_Stmt  */
-#line 148 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 148 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                    { (yyval.stmt_ptr) = (yyvsp[0].stmt_ptr); }
-#line 1668 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1668 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 30: /* M_Stmt: IF LP Cond RP M_Stmt ELSE M_Stmt  */
-#line 151 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 151 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                          { (yyval.stmt_ptr) = new Node_IfStmt((yyvsp[-4].lor_ptr), (yyvsp[-2].stmt_ptr), (yyvsp[0].stmt_ptr)); }
-#line 1674 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1674 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 31: /* M_Stmt: BREAK SEMICOLON  */
-#line 152 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 152 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                               { (yyval.stmt_ptr) = new Node_BreakStmt(); }
-#line 1680 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1680 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 32: /* M_Stmt: CONTINUE SEMICOLON  */
-#line 153 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 153 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                  { (yyval.stmt_ptr) = new Node_ContiStmt(); }
-#line 1686 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1686 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 33: /* M_Stmt: RETURN Exp SEMICOLON  */
-#line 154 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 154 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                    { (yyval.stmt_ptr) = new Node_RetStmt((yyvsp[-1].lor_ptr)); }
-#line 1692 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1692 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 34: /* M_Stmt: RETURN SEMICOLON  */
-#line 155 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 155 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                { (yyval.stmt_ptr) = new Node_RetStmt(nullptr); }
-#line 1698 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1698 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 35: /* M_Stmt: LVal ASSIGN Exp SEMICOLON  */
-#line 156 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 156 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                         { (yyval.stmt_ptr) = new Node_LValStmt((yyvsp[-3].lval_ptr), (yyvsp[-1].lor_ptr)); }
-#line 1704 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1704 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 36: /* M_Stmt: Exp SEMICOLON  */
-#line 157 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 157 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                             { (yyval.stmt_ptr) = new Node_ExpStmt((yyvsp[-1].lor_ptr)); }
-#line 1710 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1710 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 37: /* M_Stmt: Block  */
-#line 158 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 158 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                     { (yyval.stmt_ptr) = new Node_BlockInStmt((yyvsp[0].block_ptr)); }
-#line 1716 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1716 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 38: /* M_Stmt: SEMICOLON  */
-#line 159 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 159 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                         { (yyval.stmt_ptr) = new Node_EmptyStmt();  }
-#line 1722 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1722 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 39: /* M_Stmt: WHILE LP Cond RP M_Stmt  */
-#line 160 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 160 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                       { (yyval.stmt_ptr) = new Node_WhileStmt((yyvsp[-2].lor_ptr), (yyvsp[0].stmt_ptr)); }
-#line 1728 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1728 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 40: /* U_Stmt: IF LP Cond RP Stmt  */
-#line 163 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 163 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                            { (yyval.stmt_ptr) = new Node_IfStmt((yyvsp[-2].lor_ptr), (yyvsp[0].stmt_ptr), nullptr); }
-#line 1734 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1734 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 41: /* U_Stmt: IF LP Cond RP M_Stmt ELSE U_Stmt  */
-#line 164 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 164 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                                { (yyval.stmt_ptr) = new Node_IfStmt((yyvsp[-4].lor_ptr), (yyvsp[-2].stmt_ptr), (yyvsp[0].stmt_ptr)); }
-#line 1740 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1740 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 42: /* U_Stmt: WHILE LP Cond RP U_Stmt  */
-#line 165 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 165 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                       { (yyval.stmt_ptr) = new Node_WhileStmt((yyvsp[-2].lor_ptr), (yyvsp[0].stmt_ptr)); }
-#line 1746 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1746 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 43: /* Exp: LOrExp  */
-#line 168 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 168 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
             { (yyval.lor_ptr) = (yyvsp[0].lor_ptr); }
-#line 1752 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1752 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 44: /* AddExp: MulExp  */
-#line 171 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 171 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                { (yyval.addexp_ptr) = new Node_AddExpr(nullptr, OP_None, (yyvsp[0].mulexp_ptr)); }
-#line 1758 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1758 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 45: /* AddExp: AddExp ADD MulExp  */
-#line 172 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 172 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                 { (yyval.addexp_ptr) = new Node_AddExpr((yyvsp[-2].addexp_ptr), OP_Add, (yyvsp[0].mulexp_ptr)); }
-#line 1764 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1764 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 46: /* AddExp: AddExp SUB MulExp  */
-#line 173 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 173 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                 { (yyval.addexp_ptr) = new Node_AddExpr((yyvsp[-2].addexp_ptr), OP_Sub, (yyvsp[0].mulexp_ptr)); }
-#line 1770 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1770 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 47: /* MulExp: UnaryExp  */
-#line 182 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 182 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                  { (yyval.mulexp_ptr) = new Node_MulExpr(nullptr, OP_None, (yyvsp[0].unaexpr_ptr)); }
-#line 1776 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1776 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 48: /* MulExp: MulExp MUL UnaryExp  */
-#line 183 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 183 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                   { (yyval.mulexp_ptr) = new Node_MulExpr((yyvsp[-2].mulexp_ptr), OP_Mul, (yyvsp[0].unaexpr_ptr)); }
-#line 1782 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1782 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 49: /* MulExp: MulExp DIV UnaryExp  */
-#line 184 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 184 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                   { (yyval.mulexp_ptr) = new Node_MulExpr((yyvsp[-2].mulexp_ptr), OP_Div, (yyvsp[0].unaexpr_ptr)); }
-#line 1788 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1788 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 50: /* MulExp: MulExp MOD UnaryExp  */
-#line 185 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 185 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                   { (yyval.mulexp_ptr) = new Node_MulExpr((yyvsp[-2].mulexp_ptr), OP_Mod, (yyvsp[0].unaexpr_ptr)); }
-#line 1794 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1794 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 51: /* FuncDef: INT ID LP RP Block  */
-#line 193 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 193 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                             { (yyval.fundef_ptr) = new Node_FunDef(Ret_Int, (yyvsp[-3].str_Val), nullptr, (yyvsp[0].block_ptr)); }
-#line 1800 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1800 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 52: /* FuncDef: VOID ID LP RP Block  */
-#line 194 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 194 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                   { (yyval.fundef_ptr) = new Node_FunDef(Ret_Void, (yyvsp[-3].str_Val), nullptr, (yyvsp[0].block_ptr)); }
-#line 1806 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1806 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 53: /* FuncDef: VOID ID LP FuncFParam RP Block  */
-#line 195 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 195 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                              { (yyval.fundef_ptr) = new Node_FunDef(Ret_Void, (yyvsp[-4].str_Val), (yyvsp[-2].funfparam_ptr), (yyvsp[0].block_ptr)); }
-#line 1812 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1812 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 54: /* FuncDef: INT ID LP FuncFParam RP Block  */
-#line 196 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 196 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                             { (yyval.fundef_ptr) = new Node_FunDef(Ret_Int, (yyvsp[-4].str_Val), (yyvsp[-2].funfparam_ptr), (yyvsp[0].block_ptr)); }
-#line 1818 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1818 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 55: /* FuncFParam: INT ID  */
-#line 198 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 198 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                    { (yyval.funfparam_ptr) = new Node_FunFParam((yyvsp[0].str_Val), false, nullptr, nullptr); }
-#line 1824 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1824 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 56: /* FuncFParam: INT ID LB RB ExpArray  */
-#line 199 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 199 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                     { (yyval.funfparam_ptr) = new Node_FunFParam((yyvsp[-3].str_Val), true, (yyvsp[0].exparr_ptr), nullptr); }
-#line 1830 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1830 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 57: /* FuncFParam: INT ID LB RB ExpArray COMMA FuncFParam  */
-#line 200 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 200 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                                      { (yyval.funfparam_ptr) = new Node_FunFParam((yyvsp[-5].str_Val), true, (yyvsp[-2].exparr_ptr), (yyvsp[0].funfparam_ptr)); }
-#line 1836 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1836 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 58: /* FuncFParam: INT ID COMMA FuncFParam  */
-#line 201 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 201 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                       { (yyval.funfparam_ptr) = new Node_FunFParam((yyvsp[-2].str_Val), false, nullptr, (yyvsp[0].funfparam_ptr)); }
-#line 1842 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1842 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 59: /* Block: LC BlockItem RC  */
-#line 203 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 203 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                        { (yyval.block_ptr) = new Node_Block((yyvsp[-1].blockitem_ptr)); }
-#line 1848 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1848 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 60: /* BlockItem: %empty  */
-#line 204 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 204 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
            { (yyval.blockitem_ptr) = nullptr; }
-#line 1854 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1854 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 61: /* BlockItem: VarDecl BlockItem  */
-#line 205 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 205 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                 { (yyval.blockitem_ptr) = new Node_BlockValDecItem((yyvsp[-1].valdec_ptr), (yyvsp[0].blockitem_ptr)); }
-#line 1860 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1860 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 62: /* BlockItem: Stmt BlockItem  */
-#line 206 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 206 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                              { (yyval.blockitem_ptr) = new Node_BlockStmtItem((yyvsp[-1].stmt_ptr), (yyvsp[0].blockitem_ptr)); }
-#line 1866 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1866 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 63: /* UnaryExp: PrimaryExp  */
-#line 208 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 208 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                      { (yyval.unaexpr_ptr) = (yyvsp[0].primexpr_ptr); }
-#line 1872 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1872 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 64: /* UnaryExp: ID LP RP  */
-#line 209 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 209 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                        { (yyval.unaexpr_ptr) = new Node_FuncUnaExpr((yyvsp[-2].str_Val), nullptr); }
-#line 1878 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1878 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 65: /* UnaryExp: ID LP FuncRParams RP  */
-#line 210 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 210 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                    { (yyval.unaexpr_ptr) = new Node_FuncUnaExpr((yyvsp[-3].str_Val), (yyvsp[-1].funrparam_ptr)); }
-#line 1884 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1884 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 66: /* UnaryExp: ADD UnaryExp  */
-#line 211 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 211 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                            { (yyval.unaexpr_ptr) = new Node_PMNUnaExpr(OP_Pos, (yyvsp[0].unaexpr_ptr)); }
-#line 1890 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1890 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 67: /* UnaryExp: SUB UnaryExp  */
-#line 212 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 212 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                            { (yyval.unaexpr_ptr) = new Node_PMNUnaExpr(OP_Neg, (yyvsp[0].unaexpr_ptr)); }
-#line 1896 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1896 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 68: /* UnaryExp: L_NOT UnaryExp  */
-#line 213 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 213 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                              { (yyval.unaexpr_ptr) = new Node_PMNUnaExpr(OP_Lnot, (yyvsp[0].unaexpr_ptr)); }
-#line 1902 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1902 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 69: /* FuncRParams: Exp  */
-#line 215 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 215 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                  { (yyval.funrparam_ptr) = new Node_FunRParam((yyvsp[0].lor_ptr), nullptr); }
-#line 1908 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1908 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 70: /* FuncRParams: Exp COMMA FuncRParams  */
-#line 216 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 216 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                     { (yyval.funrparam_ptr) = new Node_FunRParam((yyvsp[-2].lor_ptr), (yyvsp[0].funrparam_ptr)); }
-#line 1914 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1914 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 71: /* PrimaryExp: LP Exp RP  */
-#line 218 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 218 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                       { (yyval.primexpr_ptr) = new Node_LpExprRp((yyvsp[-1].lor_ptr)); }
-#line 1920 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1920 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 72: /* PrimaryExp: LVal  */
-#line 219 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 219 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                    { (yyval.primexpr_ptr) = (yyvsp[0].lval_ptr); }
-#line 1926 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1926 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 73: /* PrimaryExp: INT_CONST  */
-#line 220 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 220 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                         { (yyval.primexpr_ptr) = new Node_Integer((yyvsp[0].int_Val)); }
-#line 1932 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1932 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 74: /* LVal: ID ExpArray  */
-#line 222 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 222 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                   { (yyval.lval_ptr) = new Node_LVal((yyvsp[-1].str_Val), (yyvsp[0].exparr_ptr)); }
-#line 1938 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1938 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 75: /* ExpArray: %empty  */
-#line 225 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 225 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
           { (yyval.exparr_ptr) = nullptr; }
-#line 1944 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1944 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
   case 76: /* ExpArray: LB Exp RB ExpArray  */
-#line 226 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 226 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
                                  { (yyval.exparr_ptr) = new Node_ExpArr((yyvsp[-2].lor_ptr), (yyvsp[0].exparr_ptr)); }
-#line 1950 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1950 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
     break;
 
 
-#line 1954 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.tab.cc"
+#line 1954 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.tab.cc"
 
       default: break;
     }
@@ -2174,7 +2174,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 227 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.y"
+#line 227 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.y"
 
 
 

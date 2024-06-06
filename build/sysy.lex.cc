@@ -1,6 +1,6 @@
-#line 2 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.lex.cc"
+#line 2 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.lex.cc"
 
-#line 4 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.lex.cc"
+#line 4 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.lex.cc"
 
 #define  YY_INT_ALIGNED short int
 
@@ -530,8 +530,8 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
-#line 5 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 1 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
+#line 5 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 #include <ast/ast.h>
 #include "sysy.tab.hh"
 #include <stdio.h>
@@ -539,8 +539,8 @@ char *yytext;
 #include <ctype.h>
 int line_count = 1;
 extern bool error;
-#line 543 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.lex.cc"
-#line 544 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.lex.cc"
+#line 543 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.lex.cc"
+#line 544 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.lex.cc"
 
 #define INITIAL 0
 
@@ -757,10 +757,10 @@ YY_DECL
 		}
 
 	{
-#line 21 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 21 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 
 
-#line 764 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.lex.cc"
+#line 764 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.lex.cc"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -830,193 +830,193 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 23 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 23 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 {}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 24 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 24 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { line_count++; } 
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 25 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 25 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 26 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 26 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 {}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 27 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 27 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 {}
 	YY_BREAK
 case 6:
 /* rule 6 can match eol */
 YY_RULE_SETUP
-#line 28 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 28 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { line_count++; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 30 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 30 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return ADD; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 31 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 31 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return SUB; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 32 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 32 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return MUL; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 33 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 33 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return DIV; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 34 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 34 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return MOD; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 36 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 36 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return L_EQUAL; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 37 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 37 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return NE; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 38 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 38 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return LT; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 39 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 39 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return LE; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 40 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 40 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return GT; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 41 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 41 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return GE; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 43 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 43 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return LP; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 44 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 44 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return RP; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 45 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 45 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return LB; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 46 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 46 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return RB; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 47 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 47 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return LC; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 48 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 48 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return RC; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 49 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 49 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return COMMA; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 50 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 50 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return SEMICOLON; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 52 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 52 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return L_NOT; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 53 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 53 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return ASSIGN; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 55 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 55 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return L_AND; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 56 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 56 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return L_OR; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 59 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 59 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return RETURN; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 60 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 60 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return WHILE; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 61 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 61 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return BREAK; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 62 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 62 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return CONTINUE; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 63 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 63 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return IF; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 64 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 64 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return ELSE; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 66 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 66 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return VOID; }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 67 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 67 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { return INT; }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 69 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 69 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 {
     yylval.str_Val = (char *)malloc(strlen(yytext) + 1);
     strcpy(yylval.str_Val, yytext);
@@ -1026,7 +1026,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 76 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 76 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { 
     yylval.int_Val = atoi(yytext); 
     return INT_CONST; 
@@ -1034,15 +1034,15 @@ YY_RULE_SETUP
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 81 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 81 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 { printf("line:%d ERROR(%s)\n", line_count, yytext); error = true;}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 82 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 82 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 ECHO;
 	YY_BREAK
-#line 1046 "/home/utena/lab3_final/compile_principle_lab3/build/sysy.lex.cc"
+#line 1046 "/home/kaill/Desktop/lab3/compile_principle_lab3/build/sysy.lex.cc"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2059,6 +2059,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 82 "/home/utena/lab3_final/compile_principle_lab3/src/sysy.l"
+#line 82 "/home/kaill/Desktop/lab3/compile_principle_lab3/src/sysy.l"
 
 

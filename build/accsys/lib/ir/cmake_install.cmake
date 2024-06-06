@@ -1,4 +1,4 @@
-# Install script for directory: /home/utena/lab3_final/compile_principle_lab3/accsys/lib/ir
+# Install script for directory: /home/kaill/Desktop/lab3/compile_principle_lab3/accsys/lib/ir
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

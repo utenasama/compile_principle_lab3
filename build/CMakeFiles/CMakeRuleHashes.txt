@@ -1,3 +1,3 @@
 # Hashes of file build rules.
-21e2127064b28cb91a1ce472c5e1b61d sysy.lex.cc
-2525c665ffc152f4c71da209e977d5a0 sysy.tab.cc
+d4418361a7396a965f9e390d409476c2 sysy.lex.cc
+11fbd66d7ce830788f75ad5f03e7ca54 sysy.tab.cc

@@ -1,4 +1,4 @@
-# Install script for directory: /home/utena/lab3_final/compile_principle_lab3/third_party/fmt
+# Install script for directory: /home/kaill/Desktop/lab3/compile_principle_lab3/third_party/fmt
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -42,55 +42,59 @@ if(NOT DEFINED CMAKE_OBJDUMP)
   set(CMAKE_OBJDUMP "/usr/bin/objdump")
 endif()
 
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "/home/utena/lab3_final/compile_principle_lab3/build/third_party/fmt/libfmt.a")
+if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "/home/kaill/Desktop/lab3/compile_principle_lab3/build/third_party/fmt/libfmt.a")
 endif()
 
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include/fmt" TYPE FILE FILES
-    "/home/utena/lab3_final/compile_principle_lab3/third_party/fmt/include/fmt/args.h"
-    "/home/utena/lab3_final/compile_principle_lab3/third_party/fmt/include/fmt/chrono.h"
-    "/home/utena/lab3_final/compile_principle_lab3/third_party/fmt/include/fmt/color.h"
-    "/home/utena/lab3_final/compile_principle_lab3/third_party/fmt/include/fmt/compile.h"
-    "/home/utena/lab3_final/compile_principle_lab3/third_party/fmt/include/fmt/core.h"
-    "/home/utena/lab3_final/compile_principle_lab3/third_party/fmt/include/fmt/format.h"
-    "/home/utena/lab3_final/compile_principle_lab3/third_party/fmt/include/fmt/format-inl.h"
-    "/home/utena/lab3_final/compile_principle_lab3/third_party/fmt/include/fmt/os.h"
-    "/home/utena/lab3_final/compile_principle_lab3/third_party/fmt/include/fmt/ostream.h"
-    "/home/utena/lab3_final/compile_principle_lab3/third_party/fmt/include/fmt/printf.h"
-    "/home/utena/lab3_final/compile_principle_lab3/third_party/fmt/include/fmt/ranges.h"
-    "/home/utena/lab3_final/compile_principle_lab3/third_party/fmt/include/fmt/std.h"
-    "/home/utena/lab3_final/compile_principle_lab3/third_party/fmt/include/fmt/xchar.h"
+    "/home/kaill/Desktop/lab3/compile_principle_lab3/third_party/fmt/include/fmt/args.h"
+    "/home/kaill/Desktop/lab3/compile_principle_lab3/third_party/fmt/include/fmt/chrono.h"
+    "/home/kaill/Desktop/lab3/compile_principle_lab3/third_party/fmt/include/fmt/color.h"
+    "/home/kaill/Desktop/lab3/compile_principle_lab3/third_party/fmt/include/fmt/compile.h"
+    "/home/kaill/Desktop/lab3/compile_principle_lab3/third_party/fmt/include/fmt/core.h"
+    "/home/kaill/Desktop/lab3/compile_principle_lab3/third_party/fmt/include/fmt/format.h"
+    "/home/kaill/Desktop/lab3/compile_principle_lab3/third_party/fmt/include/fmt/format-inl.h"
+    "/home/kaill/Desktop/lab3/compile_principle_lab3/third_party/fmt/include/fmt/os.h"
+    "/home/kaill/Desktop/lab3/compile_principle_lab3/third_party/fmt/include/fmt/ostream.h"
+    "/home/kaill/Desktop/lab3/compile_principle_lab3/third_party/fmt/include/fmt/printf.h"
+    "/home/kaill/Desktop/lab3/compile_principle_lab3/third_party/fmt/include/fmt/ranges.h"
+    "/home/kaill/Desktop/lab3/compile_principle_lab3/third_party/fmt/include/fmt/std.h"
+    "/home/kaill/Desktop/lab3/compile_principle_lab3/third_party/fmt/include/fmt/xchar.h"
     )
 endif()
 
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/fmt" TYPE FILE FILES
-    "/home/utena/lab3_final/compile_principle_lab3/build/third_party/fmt/fmt-config.cmake"
-    "/home/utena/lab3_final/compile_principle_lab3/build/third_party/fmt/fmt-config-version.cmake"
+    "/home/kaill/Desktop/lab3/compile_principle_lab3/build/third_party/fmt/fmt-config.cmake"
+    "/home/kaill/Desktop/lab3/compile_principle_lab3/build/third_party/fmt/fmt-config-version.cmake"
     )
 endif()
 
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/cmake/fmt/fmt-targets.cmake")
-    file(DIFFERENT EXPORT_FILE_CHANGED FILES
+    file(DIFFERENT _cmake_export_file_changed FILES
          "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/cmake/fmt/fmt-targets.cmake"
-         "/home/utena/lab3_final/compile_principle_lab3/build/third_party/fmt/CMakeFiles/Export/lib/cmake/fmt/fmt-targets.cmake")
-    if(EXPORT_FILE_CHANGED)
-      file(GLOB OLD_CONFIG_FILES "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/cmake/fmt/fmt-targets-*.cmake")
-      if(OLD_CONFIG_FILES)
-        message(STATUS "Old export file \"$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/cmake/fmt/fmt-targets.cmake\" will be replaced.  Removing files [${OLD_CONFIG_FILES}].")
-        file(REMOVE ${OLD_CONFIG_FILES})
+         "/home/kaill/Desktop/lab3/compile_principle_lab3/build/third_party/fmt/CMakeFiles/Export/b834597d9b1628ff12ae4314c3a2e4b8/fmt-targets.cmake")
+    if(_cmake_export_file_changed)
+      file(GLOB _cmake_old_config_files "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/cmake/fmt/fmt-targets-*.cmake")
+      if(_cmake_old_config_files)
+        string(REPLACE ";" ", " _cmake_old_config_files_text "${_cmake_old_config_files}")
+        message(STATUS "Old export file \"$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/cmake/fmt/fmt-targets.cmake\" will be replaced.  Removing files [${_cmake_old_config_files_text}].")
+        unset(_cmake_old_config_files_text)
+        file(REMOVE ${_cmake_old_config_files})
       endif()
+      unset(_cmake_old_config_files)
     endif()
+    unset(_cmake_export_file_changed)
   endif()
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/fmt" TYPE FILE FILES "/home/utena/lab3_final/compile_principle_lab3/build/third_party/fmt/CMakeFiles/Export/lib/cmake/fmt/fmt-targets.cmake")
-  if("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^()$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/fmt" TYPE FILE FILES "/home/utena/lab3_final/compile_principle_lab3/build/third_party/fmt/CMakeFiles/Export/lib/cmake/fmt/fmt-targets-noconfig.cmake")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/fmt" TYPE FILE FILES "/home/kaill/Desktop/lab3/compile_principle_lab3/build/third_party/fmt/CMakeFiles/Export/b834597d9b1628ff12ae4314c3a2e4b8/fmt-targets.cmake")
+  if(CMAKE_INSTALL_CONFIG_NAME MATCHES "^()$")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/fmt" TYPE FILE FILES "/home/kaill/Desktop/lab3/compile_principle_lab3/build/third_party/fmt/CMakeFiles/Export/b834597d9b1628ff12ae4314c3a2e4b8/fmt-targets-noconfig.cmake")
   endif()
 endif()
 
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/utena/lab3_final/compile_principle_lab3/build/third_party/fmt/fmt.pc")
+if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/kaill/Desktop/lab3/compile_principle_lab3/build/third_party/fmt/fmt.pc")
 endif()
 
