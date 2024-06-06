@@ -1,19 +1,5 @@
 #pragma once
-#include "ir/ir.h"
-#include "ir/type.h"
-#include "ir/ir.def"
-#include "utils/list.h"
-#include "utils/casting.h"
-#include <iostream>
-#include "ast/check.h"
-#include <fmt/core.h>
-#include <cassert>
-#include <map>
-#include <vector>
-#include <list>
-#include <memory>
-
-void trans_root(Root_ptr root, std::ostream& out);
+#include "inst/translate.h"
 
 extern bool error;
 std::vector<std::map<std::string, VarType_ptr>> symbol_table_var_; 
@@ -38,95 +24,68 @@ int lor_count = 0;
 int land_count = 0;
 bool cur_bb_has_term = false;
 
-Value* trans_unaexp(UnaExpr_ptr unaexp);
-Value* trans_exparr(ExpArr_ptr exparr);
-Value* trans_addexp(AddExpr_ptr addexp);
-void trans_stmt(Stmt_ptr stmt, BasicBlock *entry, BasicBlock *exit);
-void trans_block(Block_ptr block, BasicBlock *entry, BasicBlock *exit);
-Value* trans_rel(Rel_ptr rel);
-Value* trans_eq(Eq_ptr eq);
-Value* trans_land(LAnd_ptr land);
-Value* trans_lor(LOr_ptr lor);
-Value* trans_land_sc(LAnd_ptr land, BasicBlock *, BasicBlock*);
-Value* trans_lor_sc(LOr_ptr lor, BasicBlock*, BasicBlock*);
-
-
-void push_scope_lab3()  //加入一个新的作用域
+void push_symbol_table_()  //加入一个新的符号表
 {
     symbol_table_var_.push_back(std::map<std::string, VarType_ptr>());
     symbol_table_func_.push_back(std::map<std::string, FuncType_ptr>());
+    // puts("1");
 }
 
-void pop_scope_lab3()
+void pop_symbol_table_()
 {
-    //记得清理new的元素
-    auto scope_var = symbol_table_var_.back();
-    for(auto &ele : scope_var)
-    {
-        delete ele.second;
-        ele.second = nullptr;
-    }
+    auto table_var = symbol_table_var_.back();
     symbol_table_var_.pop_back();
 
-    auto scope_func = symbol_table_func_.back();
-    for(auto &ele : scope_func)
-    {   
-        //先清理funcptr里面的fparams(这是一个vector<VarType_ptr>)
-        for(auto &var_ele : ele.second->FParams)
-        {
-            delete var_ele;
-            var_ele = nullptr;
-        }
-        delete ele.second;
-        ele.second = nullptr;
-    }
+    auto table_func = symbol_table_func_.back();
     symbol_table_func_.pop_back();
+    // puts("2");
 }
 
-void add_variable_to_table_lab3(VarType_ptr variableptr)
+void add_var_to_table_(VarType_ptr variableptr)
 {
-    if(symbol_table_var_.begin() == symbol_table_var_.end())
+    if (symbol_table_var_.begin() == symbol_table_var_.end())
     {
         error = true;
-        fmt::print("Error in add_variable_to_table, no scopes\n");
+        fmt::print("Error in add_var_to_table, no scopes\n");
         return;
     }
 
-    auto scope = symbol_table_var_.rbegin(); //最后一个scope
-    if(scope->find(variableptr->ValID) != scope->end())
+    auto scope = symbol_table_var_.end() - 1; // 最后一个scope
+    //找到了重复的变量名
+    if (scope->find(variableptr->ValID) != scope->end())
     {
         error = true;
         fmt::print("Error! Redefination of VarType \"{}\"\n", variableptr->ValID);
         return;
+    }else{
+        scope->insert(std::pair<std::string, VarType_ptr>(variableptr->ValID, variableptr));
     }
-    scope->insert(std::pair<std::string, VarType_ptr>(variableptr->ValID, variableptr));
 }
 
-void add_function_to_table_lab3(FuncType_ptr funcptr)
+void add_func_to_table_(FuncType_ptr funcptr)
 {
-    if(symbol_table_func_.begin() == symbol_table_func_.end())
+    if (symbol_table_func_.begin() == symbol_table_func_.end())
     {
         error = true;
-        fmt::print("Error in add_function_to_table, no scopes\n");
+        fmt::print("Error in add_func_to_table, no scopes\n");
         return;
     }
-
-    for(std::vector<std::map<std::string, FuncType_ptr>>::iterator iter = symbol_table_func_.end()-1; 
-        iter >= symbol_table_func_.begin(); iter--)
+    // 函数名不可重复
+    auto iter = symbol_table_func_.end() - 1;
+    for (auto iter = symbol_table_func_.end() - 1; iter >= symbol_table_func_.begin(); iter--)
     {
-        if(iter->find(funcptr->FuncID) != iter->end())
+        if (iter->find(funcptr->FuncID) != iter->end())
         {
             error = true;
             fmt::print("Error! Redefination of FuncType \"{}\"\n", funcptr->FuncID);
             return;
         }
-
-        //没有找到重复的函数定义，可以插入
-        if(iter == symbol_table_func_.begin())
-        {
-            auto scope = symbol_table_func_.rbegin(); //最后一个scope
-            scope->insert(std::pair<std::string, FuncType_ptr>(funcptr->FuncID, funcptr));
-        }
+    }
+    // 未找到重复的函数定义
+    if (iter == symbol_table_func_.begin())
+    {
+        auto scope = symbol_table_func_.rbegin(); // 最后一个scope
+        scope->insert(std::pair<std::string, FuncType_ptr>(funcptr->FuncID, funcptr));
     }
 
 }
@@ -481,7 +440,7 @@ void trans_valdec(ValDec_ptr valdec)
     }
 
     auto *variable = new VarType(valdec->ID, dimensions, dim_vec, ValAddr);
-    add_variable_to_table_lab3(variable);
+    add_var_to_table_(variable);
 }
 
 //具体翻译变量声明
@@ -524,7 +483,7 @@ void trans_valdec_global(ValDec_ptr valdec)
     }
 
     auto *variable = new VarType(valdec->ID, dimensions, dim_vec, ValAddr);
-    add_variable_to_table_lab3(variable);
+    add_var_to_table_(variable);
 }
 
 
@@ -646,9 +605,9 @@ void trans_contistmt(ContiStmt_ptr contistmt, BasicBlock *entry)
 void trans_blockinstmt(BlockInStmt_ptr blockinstmt, BasicBlock *entry, BasicBlock *exit)
 {
     assert(blockinstmt != nullptr);
-    push_scope_lab3();
+    push_symbol_table_();
     trans_block(blockinstmt->Block, entry, exit);
-    pop_scope_lab3();
+    pop_symbol_table_();
 
 }
 
@@ -983,10 +942,10 @@ void trans_fundec_lab3(FunDef_ptr fundef)
     }
 
     auto *function = new FuncType(fundef->FunID, fundef->RType, params, F);
-    add_function_to_table_lab3(function);
+    add_func_to_table_(function);
 
     //新加入一个scope，也就是函数的作用域
-    push_scope_lab3();
+    push_symbol_table_();
     current_basic_block = Entry;
     cur_bb_has_term = false;
     block_count++;
@@ -1003,13 +962,13 @@ void trans_fundec_lab3(FunDef_ptr fundef)
             val_ptr = Val_Addr;           
         }
         auto *param = new VarType(ele->ValID, ele->Dimensions, ele->DimensionSizes,val_ptr, count); //这里改成拷贝构造函数可能更好
-        add_variable_to_table_lab3(param);
+        add_var_to_table_(param);
 
         count++;
     }
     //TODO:
     trans_block(fundef->Block, nullptr, nullptr);
-    pop_scope_lab3();
+    pop_symbol_table_();
 }
 
 
@@ -1070,7 +1029,7 @@ void trans_compunit(CompUnit_ptr compunit)
 void trans_root(Root_ptr root, std::ostream & out)
 {
     assert(root != nullptr);
-    push_scope_lab3();
+    push_symbol_table_();
 
     //加入运行时函数到最外层作用域之中
     auto scope = symbol_table_func_.begin();

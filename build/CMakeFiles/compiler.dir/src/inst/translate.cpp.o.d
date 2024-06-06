@@ -1,6 +1,7 @@
 CMakeFiles/compiler.dir/src/inst/translate.cpp.o: \
  /home/kaill/Desktop/lab3/compile_principle_lab3/src/inst/translate.cpp \
  /usr/include/stdc-predef.h \
+ /home/kaill/Desktop/lab3/compile_principle_lab3/include/inst/translate.h \
  /home/kaill/Desktop/lab3/compile_principle_lab3/accsys/include/ir/ir.h \
  /home/kaill/Desktop/lab3/compile_principle_lab3/accsys/include/ir/type.h \
  /usr/include/c++/12/unordered_map /usr/include/c++/12/type_traits \

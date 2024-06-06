@@ -555,6 +555,7 @@ CMakeFiles/compiler.dir/src/ast/check.cpp.o: /home/kaill/Desktop/lab3/compile_pr
 
 CMakeFiles/compiler.dir/src/inst/translate.cpp.o: /home/kaill/Desktop/lab3/compile_principle_lab3/src/inst/translate.cpp \
   /usr/include/stdc-predef.h \
+  /home/kaill/Desktop/lab3/compile_principle_lab3/include/inst/translate.h \
   /home/kaill/Desktop/lab3/compile_principle_lab3/accsys/include/ir/ir.h \
   /home/kaill/Desktop/lab3/compile_principle_lab3/accsys/include/ir/type.h \
   /usr/include/c++/12/unordered_map \
@@ -1467,13 +1468,13 @@ sysy.lex.cc:
 
 /usr/include/c++/12/fstream:
 
-/home/kaill/Desktop/lab3/compile_principle_lab3/include/inst/translate.h:
-
 /usr/include/c++/12/bits/list.tcc:
 
 /usr/include/c++/12/bits/stl_list.h:
 
 /usr/include/c++/12/list:
+
+/home/kaill/Desktop/lab3/compile_principle_lab3/include/inst/translate.h:
 
 /home/kaill/Desktop/lab3/compile_principle_lab3/src/inst/translate.cpp:
 
