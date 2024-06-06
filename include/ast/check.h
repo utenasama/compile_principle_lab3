@@ -16,6 +16,7 @@ struct VarType {
     std::string ValID;
     int Dimensions;
     std::vector<int> DimensionSizes;
+    
     Value *Val_Ptr;
     std::vector<std::optional<std::size_t>> Bounds;
     int Param_No;

@@ -1,4 +1,4 @@
-# Install script for directory: /home/kaill/Desktop/lab3/compile_principle_lab3/accsys
+# Install script for directory: /home/utena/lab3_final/compile_principle_lab3/accsys
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -44,7 +44,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/kaill/Desktop/lab3/compile_principle_lab3/build/accsys/lib/cmake_install.cmake")
+  include("/home/utena/lab3_final/compile_principle_lab3/build/accsys/lib/cmake_install.cmake")
 
 endif()
 
