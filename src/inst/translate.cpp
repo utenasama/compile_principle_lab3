@@ -1,7 +1,6 @@
 #pragma once
 #include "inst/translate.h"
 
-extern bool error;
 std::vector<std::map<std::string, VarType_ptr>> symbol_table_var_; 
 std::vector<std::map<std::string, FuncType_ptr>> symbol_table_func_;
 
@@ -17,7 +16,10 @@ Function *Function_main = Function::Create(
 BasicBlock *Entry_main = BasicBlock::Create(Function_main);
 BasicBlock *current_basic_block;
 
-bool cur_bb_has_term = false;
+//current basic block has terminator?
+bool hasTerminator = false;
+extern bool error;
+
 
 void push_symbol_table_()  //加入一个新的符号表
 {
@@ -533,7 +535,7 @@ void trans_retstmt(RetStmt_ptr retstmt)
     }
 
     RetInst *returnInstruction = RetInst::Create(returnValue, current_basic_block);
-    cur_bb_has_term = true;
+    hasTerminator = true;
 }
 
 void trans_expstmt(ExpStmt_ptr expstmt)
@@ -544,17 +546,17 @@ void trans_expstmt(ExpStmt_ptr expstmt)
 
 void trans_breakstmt(BreakStmt_ptr breakstmt, BasicBlock *exit)
 {
-    if(!cur_bb_has_term){
+    if(!hasTerminator){
         JumpInst *JFE = JumpInst::Create(exit, current_basic_block);
-        cur_bb_has_term = true;
+        hasTerminator = true;
     }
 }
 
 void trans_contistmt(ContiStmt_ptr contistmt, BasicBlock *entry)
 {
-    if(!cur_bb_has_term){
+    if(!hasTerminator){
         JumpInst *JFE = JumpInst::Create(entry, current_basic_block);
-        cur_bb_has_term = true;
+        hasTerminator = true;
     }
 }
 
@@ -725,9 +727,9 @@ void trans_whilestmt(WhileStmt_ptr whilestmt)
     BasicBlock *Exit = BasicBlock::Create(current_basic_block->getParent());
 
     //插一条jump到当前block 跳转到entry
-    if(!cur_bb_has_term){
+    if(!hasTerminator){
         JumpInst *JTE = JumpInst::Create(Entry, current_basic_block);
-        cur_bb_has_term = true;
+        hasTerminator = true;
     }
 
     //下面开始翻译
@@ -735,17 +737,17 @@ void trans_whilestmt(WhileStmt_ptr whilestmt)
     Value* res_value = trans_lor_shortcut(whilestmt->Cond, Body, Exit);  //如果不等于0，就是true
 
     current_basic_block = Body;
-    cur_bb_has_term = false;
+    hasTerminator = false;
 
     trans_stmt(whilestmt->WhileBody, Entry, Exit);
-    if(!cur_bb_has_term)
+    if(!hasTerminator)
     {
         JumpInst *JTE2 = JumpInst::Create(Entry, current_basic_block);
-        cur_bb_has_term = true;
+        hasTerminator = true;
     }
 
     current_basic_block = Exit;
-    cur_bb_has_term = false;
+    hasTerminator = false;
 
 }
 //TODO
@@ -767,26 +769,26 @@ void trans_ifstmt(IfStmt_ptr ifstmt, BasicBlock *entry, BasicBlock *exit)
     if(ifstmt->ElseBody != nullptr)
     {   
         current_basic_block = True;
-        cur_bb_has_term = false;
+        hasTerminator = false;
         trans_stmt(ifstmt->IfBody, entry, exit);
-        if(!cur_bb_has_term){
+        if(!hasTerminator){
             JumpInst::Create(Exit_If, current_basic_block);
-            cur_bb_has_term = true;
+            hasTerminator = true;
         }
         current_basic_block = False;
-        cur_bb_has_term = false;
+        hasTerminator = false;
         trans_stmt(ifstmt->ElseBody, entry, exit);
     }else{
         current_basic_block = True;
-        cur_bb_has_term = false;
+        hasTerminator = false;
         trans_stmt(ifstmt->IfBody, entry, exit);
     }
-    if(!cur_bb_has_term){
+    if(!hasTerminator){
         JumpInst::Create(Exit_If, current_basic_block);
-        cur_bb_has_term = true;
+        hasTerminator = true;
     }
     current_basic_block = Exit_If;
-    cur_bb_has_term = false;
+    hasTerminator = false;
 }
 
 
@@ -873,7 +875,7 @@ void trans_fundec(FunDef_ptr fundef)
     //新加入一个scope，也就是函数的作用域
     push_symbol_table_();
     current_basic_block = Entry;
-    cur_bb_has_term = false;
+    hasTerminator = false;
     //函数的参数属于自己的那个作用域，顺便为所有形参加上名字
     int count = 0;
     for(auto *ele : params)
