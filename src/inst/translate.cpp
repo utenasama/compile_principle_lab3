@@ -4,14 +4,17 @@
 extern bool error;
 std::vector<std::map<std::string, VarType_ptr>> symbol_table_var_; 
 std::vector<std::map<std::string, FuncType_ptr>> symbol_table_func_;
+
 //生成module
 auto Module_main = std::make_unique<Module>();
-Type *IntegerType = Type::getIntegerTy();
-Type *UnitType = Type::getUnitTy();
-PointerType *PtrIntType = PointerType::get(IntegerType);
-FunctionType *FT_main = FunctionType::get(IntegerType, {});
-Function *F_main = Function::Create(FT_main, false, "main", Module_main.get());
-BasicBlock *Entry_main = BasicBlock::Create(F_main);
+
+Function *Function_main = Function::Create(
+    FunctionType::get(Type::getIntegerTy(), {}),
+    false, 
+    "main", 
+    Module_main.get()
+);
+BasicBlock *Entry_main = BasicBlock::Create(Function_main);
 BasicBlock *current_basic_block;
 
 //用于记录if while的数量，方便block命名
@@ -102,13 +105,13 @@ Value* trans_pmn_unaexpr(PMNUnaExpr_ptr pmn_unaexp)
         case OP_Lnot:
         {
             Value* ret_value = trans_unaexp(pmn_unaexp->Operand);
-            return BinaryInst::CreateEq(ret_value, ConstantInt::Create(0), IntegerType, current_basic_block);
+            return BinaryInst::CreateEq(ret_value, ConstantInt::Create(0), Type::getIntegerTy(), current_basic_block);
             break;
         }
         case OP_Neg:
         {
             Value* ret_value = trans_unaexp(pmn_unaexp->Operand);
-            return BinaryInst::CreateSub(ConstantInt::Create(0), ret_value, IntegerType, current_basic_block);
+            return BinaryInst::CreateSub(ConstantInt::Create(0), ret_value, Type::getIntegerTy(), current_basic_block);
             break;
         }
         case OP_Pos:
@@ -199,9 +202,9 @@ Value* trans_lval(LVal_ptr lval)
                 OffsetInst *Offset;
 
                 if(valptr->Val_Ptr == nullptr)  //Value是nullptr，说明这是一个形参，需要用getarg获得实参
-                    Offset = OffsetInst::Create(IntegerType, current_basic_block->getParent()->getArg(valptr->Param_No), Indices, valptr->Bounds, current_basic_block);
+                    Offset = OffsetInst::Create(Type::getIntegerTy(), current_basic_block->getParent()->getArg(valptr->Param_No), Indices, valptr->Bounds, current_basic_block);
                 else
-                    Offset = OffsetInst::Create(IntegerType, valptr->Val_Ptr, Indices, valptr->Bounds,current_basic_block);
+                    Offset = OffsetInst::Create(Type::getIntegerTy(), valptr->Val_Ptr, Indices, valptr->Bounds,current_basic_block);
                 
                 if(!need_load)
                     return Offset;
@@ -262,9 +265,9 @@ Value* trans_lval_noload(LVal_ptr lval)
             if(dimensions != 0){
                 OffsetInst *Offset;
                 if(valptr->Val_Ptr == nullptr)  
-                    Offset = OffsetInst::Create(IntegerType, current_basic_block->getParent()->getArg(valptr->Param_No), Indices, valptr->Bounds, current_basic_block);
+                    Offset = OffsetInst::Create(Type::getIntegerTy(), current_basic_block->getParent()->getArg(valptr->Param_No), Indices, valptr->Bounds, current_basic_block);
                 else
-                    Offset = OffsetInst::Create(IntegerType, valptr->Val_Ptr, Indices, valptr->Bounds,current_basic_block);
+                    Offset = OffsetInst::Create(Type::getIntegerTy(), valptr->Val_Ptr, Indices, valptr->Bounds,current_basic_block);
                 
                 return Offset;
             }
@@ -318,7 +321,7 @@ Value* trans_mulexp(MulExpr_ptr mulexp)
             return BinaryInst::CreateMul(
                 trans_mulexp(mulexp->Operand), 
                 trans_unaexp(mulexp->UnaExpr), 
-                IntegerType, 
+                Type::getIntegerTy(), 
                 current_basic_block
             );
         }
@@ -327,7 +330,7 @@ Value* trans_mulexp(MulExpr_ptr mulexp)
             return BinaryInst::CreateDiv(
                 trans_mulexp(mulexp->Operand), 
                 trans_unaexp(mulexp->UnaExpr),
-                IntegerType,
+                Type::getIntegerTy(),
                 current_basic_block
             );
         }
@@ -336,7 +339,7 @@ Value* trans_mulexp(MulExpr_ptr mulexp)
             return BinaryInst::CreateMod(
                 trans_mulexp(mulexp->Operand), 
                 trans_unaexp(mulexp->UnaExpr), 
-                IntegerType, 
+                Type::getIntegerTy(), 
                 current_basic_block
             );
         }
@@ -355,7 +358,7 @@ Value* trans_addexp(AddExpr_ptr addexp)
             return BinaryInst::CreateAdd(
                 trans_addexp(addexp->Operand), 
                 trans_mulexp(addexp->MulExpr), 
-                IntegerType, 
+                Type::getIntegerTy(), 
                 current_basic_block
             );
         }
@@ -364,7 +367,7 @@ Value* trans_addexp(AddExpr_ptr addexp)
             return BinaryInst::CreateSub(
                 trans_addexp(addexp->Operand), 
                 trans_mulexp(addexp->MulExpr), 
-                IntegerType, 
+                Type::getIntegerTy(), 
                 current_basic_block
             );
         }
@@ -407,7 +410,7 @@ void trans_valdec(ValDec_ptr valdec)
     }
 
     //变量alloca指令
-    AllocaInst *ValAddr = AllocaInst::Create(IntegerType, element_len, current_basic_block);
+    AllocaInst *ValAddr = AllocaInst::Create(Type::getIntegerTy(), element_len, current_basic_block);
 
     if(valdec->InitVal != nullptr)
     {
@@ -450,7 +453,7 @@ void trans_valdec_global(ValDec_ptr valdec)
 
     //变量alloca指令
 
-    auto ValAddr = GlobalVariable::Create(IntegerType, element_len, false, valdec->ID, Module_main.get());  
+    auto ValAddr = GlobalVariable::Create(Type::getIntegerTy(), element_len, false, valdec->ID, Module_main.get());  
     if(valdec->InitVal != nullptr)
     {
         if(valdec->ExpArr != nullptr)  //lab为了简化，不支持数组初始化
@@ -578,7 +581,7 @@ Value* trans_lor(LOr_ptr lor)
         return BinaryInst::CreateOr(
             trans_land(lor->LAnd), 
             trans_lor(lor->Operand), 
-            IntegerType, 
+            Type::getIntegerTy(), 
             current_basic_block
         );
     }else{
@@ -594,7 +597,7 @@ Value* trans_land(LAnd_ptr land)
         return BinaryInst::CreateAnd(
             trans_eq(land->Eq), 
             trans_land(land->Operand), 
-            IntegerType, 
+            Type::getIntegerTy(), 
             current_basic_block
         );
     }else{
@@ -662,7 +665,7 @@ Value* trans_eq(Eq_ptr eq)
                 return BinaryInst::CreateEq(
                     trans_eq(eq->Operand), 
                     trans_rel(eq->Rel), 
-                    IntegerType, 
+                    Type::getIntegerTy(), 
                     current_basic_block
                 );
                 break;
@@ -670,7 +673,7 @@ Value* trans_eq(Eq_ptr eq)
                 return BinaryInst::CreateNe(
                     trans_eq(eq->Operand), 
                     trans_rel(eq->Rel), 
-                    IntegerType, 
+                    Type::getIntegerTy(), 
                     current_basic_block
                 );
                 break;
@@ -689,7 +692,7 @@ Value* trans_rel(Rel_ptr rel)
                 return BinaryInst::CreateLt(
                     trans_rel(rel->Operand), 
                     trans_addexp(rel->Expr), 
-                    IntegerType, 
+                    Type::getIntegerTy(), 
                     current_basic_block
                 );
                 break;
@@ -697,7 +700,7 @@ Value* trans_rel(Rel_ptr rel)
                 return BinaryInst::CreateGt(
                     trans_rel(rel->Operand), 
                     trans_addexp(rel->Expr), 
-                    IntegerType, 
+                    Type::getIntegerTy(), 
                     current_basic_block
                 );
                 break;
@@ -705,7 +708,7 @@ Value* trans_rel(Rel_ptr rel)
                 return BinaryInst::CreateLe(
                     trans_rel(rel->Operand), 
                     trans_addexp(rel->Expr), 
-                    IntegerType, 
+                    Type::getIntegerTy(), 
                     current_basic_block
                 );
                 break;
@@ -713,7 +716,7 @@ Value* trans_rel(Rel_ptr rel)
                 return BinaryInst::CreateGe(
                     trans_rel(rel->Operand), 
                     trans_addexp(rel->Expr), 
-                    IntegerType, 
+                    Type::getIntegerTy(), 
                     current_basic_block
                 );
                 break;
@@ -851,9 +854,9 @@ void trans_fundec(FunDef_ptr fundef)
             if(param != nullptr)
                 params.push_back(param);
             if(param->Dimensions != 0)    //记录形参type
-                Params_lab3.push_back(PtrIntType);
+                Params_lab3.push_back(PointerType::get(Type::getIntegerTy()));
             else
-                Params_lab3.push_back(IntegerType);
+                Params_lab3.push_back(Type::getIntegerTy());
             funfparam = funfparam->NextFunFParam;
         }
     }
@@ -861,9 +864,9 @@ void trans_fundec(FunDef_ptr fundef)
     //设置返回类型Type
     Type *ret_type;
     if(fundef->RType == Ret_Int)
-        ret_type = IntegerType;
+        ret_type = Type::getIntegerTy();
     else
-        ret_type = UnitType;
+        ret_type = Type::getUnitTy();
 
     //生成函数以及对应block
     BasicBlock *Entry;
@@ -873,7 +876,7 @@ void trans_fundec(FunDef_ptr fundef)
         F = Function::Create(FT, false, fundef->FunID, Module_main.get());
         Entry = BasicBlock::Create(F);
     }else{
-        F = F_main;
+        F = Function_main;
         Entry = Entry_main;
     }
 
@@ -892,7 +895,7 @@ void trans_fundec(FunDef_ptr fundef)
         Value *val_ptr = nullptr;
         if(ele->Dimensions == 0)
         {
-            AllocaInst *Val_Addr = AllocaInst::Create(IntegerType, 1, current_basic_block);
+            AllocaInst *Val_Addr = AllocaInst::Create(Type::getIntegerTy(), 1, current_basic_block);
 
             StoreInst *NArgStore = StoreInst::Create(current_basic_block->getParent()->getArg(count), Val_Addr, current_basic_block);
             val_ptr = Val_Addr;           
@@ -961,7 +964,7 @@ void trans_root(Root_ptr root, std::ostream & out)
     //加入运行时函数到最外层作用域之中
     auto scope = symbol_table_func_.begin();
     //putint
-    FunctionType *FT_putint = FunctionType::get(UnitType, {IntegerType});
+    FunctionType *FT_putint = FunctionType::get(Type::getUnitTy(), {Type::getIntegerTy()});
     Function *F_putint = Function::Create(FT_putint, true, "putint", Module_main.get());
     std::vector<VarType_ptr> params_putint;
     auto param_putint = new VarType("value", 0, {}); //这里因为不会编译putint的函数定义，所以形参叫什么都无所谓
@@ -970,13 +973,13 @@ void trans_root(Root_ptr root, std::ostream & out)
                         new FuncType("putint", Ret_Void, params_putint, F_putint)));
 
     //getint
-    FunctionType *FT_getint = FunctionType::get(IntegerType, {});
+    FunctionType *FT_getint = FunctionType::get(Type::getIntegerTy(), {});
     Function *F_getint = Function::Create(FT_getint, true, "getint", Module_main.get());
     scope->insert(std::pair<std::string, FuncType_ptr>("getint", 
                         new FuncType("getint", Ret_Int, std::vector<VarType_ptr>(), F_getint)));
 
     //putch
-    FunctionType *FT_putch = FunctionType::get(UnitType, {IntegerType});
+    FunctionType *FT_putch = FunctionType::get(Type::getUnitTy(), {Type::getIntegerTy()});
     Function *F_putch = Function::Create(FT_putch, true, "putch", Module_main.get());
     std::vector<VarType_ptr> params_putch;
     auto param_putch = new VarType("value", 0, {}); //这里因为不会编译putint的函数定义，所以形参叫什么都无所谓
@@ -985,38 +988,37 @@ void trans_root(Root_ptr root, std::ostream & out)
                         new FuncType("putch", Ret_Void, params_putch, F_putch)));
     
     //getch
-    FunctionType *FT_getch = FunctionType::get(IntegerType, {});
+    FunctionType *FT_getch = FunctionType::get(Type::getIntegerTy(), {});
     Function *F_getch = Function::Create(FT_getch, true, "getch", Module_main.get());
     scope->insert(std::pair<std::string, FuncType_ptr>("getch", 
                         new FuncType("getch", Ret_Int, std::vector<VarType_ptr>(), F_getch)));
     
     //starttime
-    FunctionType *FT_starttime = FunctionType::get(UnitType, {});
+    FunctionType *FT_starttime = FunctionType::get(Type::getUnitTy(), {});
     Function *F_starttime = Function::Create(FT_starttime, true, "starttime", Module_main.get());
     scope->insert(std::pair<std::string, FuncType_ptr>("starttime", 
                         new FuncType("starttime", Ret_Void, std::vector<VarType_ptr>(), F_starttime)));
 
     //stoptime
-    FunctionType *FT_stoptime = FunctionType::get(UnitType, {});
+    FunctionType *FT_stoptime = FunctionType::get(Type::getUnitTy(), {});
     Function *F_stoptime = Function::Create(FT_stoptime, true, "stoptime", Module_main.get());
     scope->insert(std::pair<std::string, FuncType_ptr>("stoptime", 
                         new FuncType("stoptime", Ret_Void, std::vector<VarType_ptr>(), F_stoptime)));
 
     //getarray
-    FunctionType *FT_getarray = FunctionType::get(IntegerType, {PtrIntType});
+    FunctionType *FT_getarray = FunctionType::get(Type::getIntegerTy(), {PointerType::get(Type::getIntegerTy())});
     Function *F_getarray = Function::Create(FT_getarray, true, "getarray", Module_main.get());
     std::vector<VarType_ptr> params_getarray;
-    auto param_getarray = new VarType("value", 1, std::vector({0})); //这里因为不会编译putint的函数定义，所以形参叫什么都无所谓
-    params_getarray.push_back(param_getarray);
+    auto param_getarray = new VarType("value", 1, std::vector({0})); 
     scope->insert(std::pair<std::string, FuncType_ptr>("getarray", 
                         new FuncType("getarray", Ret_Int, params_getarray, F_getarray)));
 
     //putarray
-    FunctionType *FT_putarray = FunctionType::get(UnitType, {IntegerType, PtrIntType});
+    FunctionType *FT_putarray = FunctionType::get(Type::getUnitTy(), {Type::getIntegerTy(), PointerType::get(Type::getIntegerTy())});
     Function *F_putarray = Function::Create(FT_putarray, true, "putarray", Module_main.get());
     std::vector<VarType_ptr> params_putarray;
     auto param1_putarray = new VarType("value", 0, {});
-    auto param2_putarray = new VarType("value", 1, std::vector({0})); //这里因为不会编译putint的函数定义，所以形参叫什么都无所谓
+    auto param2_putarray = new VarType("value", 1, std::vector({0})); 
     params_putarray.push_back(param1_putarray);
     params_putarray.push_back(param2_putarray);
     scope->insert(std::pair<std::string, FuncType_ptr>("putarray", 
