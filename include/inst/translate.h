@@ -23,5 +23,5 @@ Value* trans_rel(Rel_ptr rel);
 Value* trans_eq(Eq_ptr eq);
 Value* trans_land(LAnd_ptr land);
 Value* trans_lor(LOr_ptr lor);
-Value* trans_land_sc(LAnd_ptr land, BasicBlock *, BasicBlock*);
-Value* trans_lor_sc(LOr_ptr lor, BasicBlock*, BasicBlock*);
+Value* trans_land_shortcut(LAnd_ptr land, BasicBlock *, BasicBlock*);
+Value* trans_lor_shortcut(LOr_ptr lor, BasicBlock*, BasicBlock*);

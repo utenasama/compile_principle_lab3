@@ -251,7 +251,7 @@ Value* trans_lval_noload(LVal_ptr lval)
         {   //如果找到了这个变量名
             auto *valptr = map_iter->second;
 
-            //对于没有给定的维数，使用0，比如int a[2][3], a[1]的地址就是a[1][0]的地址
+
             while(dimensions < valptr->Dimensions)
             {
                 Indices.push_back(ConstantInt::Create(0));
@@ -261,7 +261,7 @@ Value* trans_lval_noload(LVal_ptr lval)
 
             if(dimensions != 0){
                 OffsetInst *Offset;
-                if(valptr->Val_Ptr == nullptr)  //Value是nullptr，说明这是一个形参，需要用getarg获得实参
+                if(valptr->Val_Ptr == nullptr)  
                     Offset = OffsetInst::Create(IntegerType, current_basic_block->getParent()->getArg(valptr->Param_No), Indices, valptr->Bounds, current_basic_block);
                 else
                     Offset = OffsetInst::Create(IntegerType, valptr->Val_Ptr, Indices, valptr->Bounds,current_basic_block);
@@ -273,7 +273,7 @@ Value* trans_lval_noload(LVal_ptr lval)
             }
         }
 
-        //没有找到
+
         if(iter == symbol_table_var_.begin())
         {
             error = true;
@@ -345,33 +345,34 @@ Value* trans_mulexp(MulExpr_ptr mulexp)
 
 Value* trans_addexp(AddExpr_ptr addexp)
 {
-    assert(addexp != nullptr);
-    if(addexp->OP != OP_None)
-    {
-        Value* res_val1 = trans_addexp(addexp->Operand);
-        Value* res_val2 = trans_mulexp(addexp->MulExpr);
-        
-        if(addexp->OP == OP_Add){
-            BinaryInst *Add = BinaryInst::CreateAdd(res_val1, res_val2, IntegerType, current_basic_block);
-            return Add;
+    switch(addexp->OP) {
+        case OP_None:
+        {
+            return trans_mulexp(addexp->MulExpr);
         }
-        else if(addexp->OP == OP_Sub){
-            BinaryInst *Sub = BinaryInst::CreateSub(res_val1, res_val2, IntegerType, current_basic_block);
-            return Sub;
+        case OP_Add:
+        {
+            return BinaryInst::CreateAdd(
+                trans_addexp(addexp->Operand), 
+                trans_mulexp(addexp->MulExpr), 
+                IntegerType, 
+                current_basic_block
+            );
         }
-        else{
-            error = true;
-            fmt::print("Error in trans_addexp, operand should be Add / Sub!!\n");
-            return nullptr;
+        case OP_Sub:
+        {
+            return BinaryInst::CreateSub(
+                trans_addexp(addexp->Operand), 
+                trans_mulexp(addexp->MulExpr), 
+                IntegerType, 
+                current_basic_block
+            );
         }
-    }else
-        return trans_mulexp(addexp->MulExpr);
+    }
 }
 
 Value* trans_exparr(ExpArr_ptr exparr)
 {
-    assert(exparr != nullptr);
-
     return trans_lor(exparr->Expr);
 }
 
@@ -379,16 +380,13 @@ Value* trans_exparr(ExpArr_ptr exparr)
 //打印初始值
 Value* trans_initval(LOr_ptr initval)
 {
-    assert(initval != nullptr);
-
     return trans_lor(initval);
 }
 
 //具体翻译变量声明
+//TODO:
 void trans_valdec(ValDec_ptr valdec)
 {
-    assert(valdec != nullptr);
-
     int dimensions = 0;
     int element_len = 1;
     std::vector<int> dim_vec;
@@ -427,9 +425,9 @@ void trans_valdec(ValDec_ptr valdec)
 }
 
 //具体翻译变量声明
+//TODO
 void trans_valdec_global(ValDec_ptr valdec)
 {
-    assert(valdec != nullptr);
 
     int dimensions = 0;
     int element_len = 1;
@@ -470,101 +468,86 @@ void trans_valdec_global(ValDec_ptr valdec)
 }
 
 
-VarType_ptr trans_funfparam_lab3(FunFParam_ptr funfparam)
+VarType_ptr trans_funfparam(FunFParam_ptr funfparam)
 {
-    assert(funfparam != nullptr);
-    int dimensions = 0;
+    int dimensionCount = 0;
+    std::vector<int> dimensionSizes;
 
-    //如果形参是一个数组，需要check维度
-    std::vector<int> dim_vec;
+    auto extractDimensionSize = [](ExpArr_ptr expArr) {
+        auto *unaryExpr = expArr->Expr->LAnd->Eq->Rel->Expr->MulExpr->UnaExpr;
+        auto *primaryExpr = static_cast<PrimExpr_ptr>(unaryExpr);
+        auto *integerExpr = primaryExpr->as<Integer_ptr>();
+        return integerExpr->Val;
+    };
+
+    // 如果形式参数是一个数组，需要检查维度
     if(funfparam->IsArr)
     {
-        dimensions += 1;    //形参如果是array，第一维是空的，而且语法分析的时候也不会视为一个ExpArr
-        dim_vec.push_back(0);
+        dimensionCount++;    // 如果形式参数是数组，第一维是空的，且在语法分析时不会被视为一个 ExpArr
+        dimensionSizes.push_back(0);
         if(funfparam->ExpArr != nullptr)
         {
-            auto *exparr = funfparam->ExpArr;
-            while(exparr != nullptr)
+            for (auto *expArr = funfparam->ExpArr; expArr != nullptr; expArr = expArr->NextExpArr)
             {
-                auto *unaexp = exparr->Expr->LAnd->Eq->Rel->Expr->MulExpr->UnaExpr;
-                auto *primexp = static_cast<PrimExpr_ptr>(unaexp);
-                auto *integer = primexp->as<Integer_ptr>();
-                int dim = integer->Val;
-                dimensions += 1;
-                dim_vec.push_back(dim);
-                exparr = exparr->NextExpArr; 
-                //函数形参不需要alloca，所以不用算总size
+                int dimensionSize = extractDimensionSize(expArr);
+                dimensionCount++;
+                dimensionSizes.push_back(dimensionSize);
+                // 函数形式参数不需要分配存储空间，所以不需要计算总大小
             }
         }
     }
-
-    return new VarType(funfparam->ID, dimensions, dim_vec);
+    return new VarType(funfparam->ID, dimensionCount, dimensionSizes);
 }
 
 
-//打印block中的valdec语句
 void trans_valdecitem(ValDecItem_ptr valdecitem)
 {
-    assert(valdecitem != nullptr);
-
-    auto *valdec = valdecitem->ValDec;
-    while(valdec != nullptr)
+    for(auto *valueDeclaration = valdecitem->ValDec; 
+        valueDeclaration != nullptr; 
+        valueDeclaration = valueDeclaration->NextValDec)
     {
-        trans_valdec(valdec);
-        valdec = valdec->NextValDec;
+        trans_valdec(valueDeclaration);
     }
 }
 
-//打印block中的statement
 void trans_stmtitem(StmtItem_ptr stmtitem, BasicBlock *entry, BasicBlock *exit)
 {
-    assert(stmtitem != nullptr);
     trans_stmt(stmtitem->Stmt, entry, exit);
 }
 
-
-//block内的变量赋值语句
 void trans_lvalstmt(LValStmt_ptr lvalstmt)
 {
-    assert(lvalstmt != nullptr);
-    Value* res_value1 = trans_lval_noload(lvalstmt->LVal);
-    Value* res_value2 = trans_lor(lvalstmt->Expr);
-
-   StoreInst *ResStore = StoreInst::Create(res_value2, res_value1, current_basic_block);
+   StoreInst *ResStore = StoreInst::Create(
+                            trans_lor(lvalstmt->Expr), 
+                            trans_lval_noload(lvalstmt->LVal), 
+                            current_basic_block
+                        );
 }
 
 void trans_retstmt(RetStmt_ptr retstmt)
 {
-    assert(retstmt != nullptr);
 
+    Value* returnValue;
     if(retstmt->Expr != nullptr)
     {
-        Value* res_value = trans_lor(retstmt->Expr);
-        RetInst *Ret = RetInst::Create(res_value,current_basic_block);
-        cur_bb_has_term = true;
-    }else{
-        Value *V = ConstantUnit::Create();
-        RetInst *Ret = RetInst::Create(V,current_basic_block);
-        cur_bb_has_term = true;
+        returnValue = trans_lor(retstmt->Expr);
+    }else
+    {
+        returnValue = ConstantUnit::Create();
     }
+
+    RetInst *returnInstruction = RetInst::Create(returnValue, current_basic_block);
+    cur_bb_has_term = true;
 }
 
 void trans_expstmt(ExpStmt_ptr expstmt)
 {
-    assert(expstmt != nullptr);
-
     if(expstmt->Expr != nullptr)
         trans_lor(expstmt->Expr);
 }
 
 void trans_breakstmt(BreakStmt_ptr breakstmt, BasicBlock *exit)
 {
-    assert(breakstmt != nullptr);
-    if(exit == nullptr)
-    {
-        printf("error in break!\n");
-        return;
-    }
     if(!cur_bb_has_term){
         JumpInst *JFE = JumpInst::Create(exit, current_basic_block);
         cur_bb_has_term = true;
@@ -573,12 +556,6 @@ void trans_breakstmt(BreakStmt_ptr breakstmt, BasicBlock *exit)
 
 void trans_contistmt(ContiStmt_ptr contistmt, BasicBlock *entry)
 {
-    assert(contistmt != nullptr);
-    if(entry == nullptr)
-    {
-        printf("error in continue !\n");
-        return;
-    }
     if(!cur_bb_has_term){
         JumpInst *JFE = JumpInst::Create(entry, current_basic_block);
         cur_bb_has_term = true;
@@ -587,24 +564,23 @@ void trans_contistmt(ContiStmt_ptr contistmt, BasicBlock *entry)
 
 void trans_blockinstmt(BlockInStmt_ptr blockinstmt, BasicBlock *entry, BasicBlock *exit)
 {
-    assert(blockinstmt != nullptr);
     push_symbol_table_();
     trans_block(blockinstmt->Block, entry, exit);
     pop_symbol_table_();
-
 }
 
 
 
 Value* trans_lor(LOr_ptr lor)
 {
-    assert(lor != nullptr);
     if(lor->Operand != nullptr)
     {
-        Value* res_val1 = trans_land(lor->LAnd);
-        Value* res_val2 = trans_lor(lor->Operand);
-        BinaryInst *Lor = BinaryInst::CreateOr(res_val1, res_val2, IntegerType, current_basic_block);
-        return Lor;
+        return BinaryInst::CreateOr(
+            trans_land(lor->LAnd), 
+            trans_lor(lor->Operand), 
+            IntegerType, 
+            current_basic_block
+        );
     }else{
         return trans_land(lor->LAnd);
     }
@@ -613,69 +589,61 @@ Value* trans_lor(LOr_ptr lor)
 
 Value* trans_land(LAnd_ptr land)
 {
-    assert(land != nullptr);
     if(land->Operand != nullptr)
     {
-        Value* res_val1 = trans_eq(land->Eq);
-        Value* res_val2 = trans_land(land->Operand);
-        BinaryInst *Land = BinaryInst::CreateAnd(res_val1, res_val2, IntegerType, current_basic_block);
-        return Land;
+        return BinaryInst::CreateAnd(
+            trans_eq(land->Eq), 
+            trans_land(land->Operand), 
+            IntegerType, 
+            current_basic_block
+        );
     }else{
         return trans_eq(land->Eq);
     }
 }
 
 
-//短路shortcut版本，用于if while
-Value* trans_lor_sc(LOr_ptr lor, BasicBlock *true_bb, BasicBlock *false_bb)
+//shortcut版本 if while
+Value* trans_lor_shortcut(LOr_ptr lor, BasicBlock *true_bb, BasicBlock *false_bb)
 {
-    assert(lor != nullptr);
     if(lor->Operand != nullptr)
     {
         BasicBlock *lor_con1_false_bb = BasicBlock::Create(current_basic_block->getParent());
-        Value* res_val1 = trans_land_sc(lor->LAnd, true_bb, lor_con1_false_bb);
-        //左边是false，就进入到lor语句的右部分block
+        Value* res_val1 = trans_land_shortcut(lor->LAnd, true_bb, lor_con1_false_bb);
         current_basic_block = lor_con1_false_bb;
         lor_count++;
-        cur_bb_has_term = false;
         block_count++;
-        Value* res_val2 = trans_lor_sc(lor->Operand, true_bb, false_bb);
-        return res_val2;
+        cur_bb_has_term = false;
+        return trans_lor_shortcut(lor->Operand, true_bb, false_bb);
     }else{
-        return trans_land_sc(lor->LAnd, true_bb, false_bb);
+        return trans_land_shortcut(lor->LAnd, true_bb, false_bb);
     }
 }
 
 
-Value* trans_land_sc(LAnd_ptr land, BasicBlock *true_bb, BasicBlock *false_bb)
+Value* trans_land_shortcut(LAnd_ptr land, BasicBlock *true_bb, BasicBlock *false_bb)
 {
-    assert(land != nullptr);
     if(land->Operand != nullptr)
     {
         BasicBlock *land_con1_true_bb = BasicBlock::Create(current_basic_block->getParent());
         Value* res_val1 = trans_eq(land->Eq);
         BranchInst *Br = BranchInst::Create(land_con1_true_bb, false_bb, res_val1, current_basic_block);
 
-        //左边是true，就进入到land语句的右部分block
         current_basic_block = land_con1_true_bb;
         land_count++;
 
         cur_bb_has_term = false;
         block_count++;
 
-        Value* res_val2 = trans_land_sc(land->Operand, true_bb, false_bb);
-        //BinaryInst *Land = BinaryInst::CreateAnd(res_val1, res_val2, IntegerType, current_basic_block);
-        return res_val2;
+        return trans_land_shortcut(land->Operand, true_bb, false_bb);
     }else{
-        //如果这个land表达式没有operand，还有一种特殊情况，就是带有()的表达式，比如if((a>1 || b<1))，这种括号表达式在if/while内也要shortcut
-        //懒得改代码，直接遍历指针，判断是不是一个括号表达式
         if(land->Eq->Operand == nullptr && land->Eq->Rel->Operand == nullptr &&
             land->Eq->Rel->Expr->Operand == nullptr && land->Eq->Rel->Expr->MulExpr->Operand == nullptr)
         {
             auto *unaexp = land->Eq->Rel->Expr->MulExpr->UnaExpr;
             if(auto *lpexprp = unaexp->as<LpExprRp_ptr>())
             {
-                return trans_lor_sc(lpexprp->Operand, true_bb, false_bb);
+                return trans_lor_shortcut(lpexprp->Operand, true_bb, false_bb);
             }
         }
 
@@ -757,7 +725,7 @@ void trans_whilestmt(WhileStmt_ptr whilestmt)
     cur_bb_has_term = false;
     block_count++;
 
-    Value* res_value = trans_lor_sc(whilestmt->Cond, Body, Exit);  //如果不等于0，就是true
+    Value* res_value = trans_lor_shortcut(whilestmt->Cond, Body, Exit);  //如果不等于0，就是true
 
     current_basic_block = Body;
     cur_bb_has_term = false;
@@ -791,9 +759,9 @@ void trans_ifstmt(IfStmt_ptr ifstmt, BasicBlock *entry, BasicBlock *exit)
 
     //下面开始翻译
     if(ifstmt->ElseBody != nullptr)
-        Value* res_value = trans_lor_sc(ifstmt->Cond, True, False);
+        Value* res_value = trans_lor_shortcut(ifstmt->Cond, True, False);
     else
-        Value* res_value = trans_lor_sc(ifstmt->Cond, True, Exit_If);
+        Value* res_value = trans_lor_shortcut(ifstmt->Cond, True, Exit_If);
     if(ifstmt->ElseBody != nullptr)
     {   
         current_basic_block = True;
@@ -894,7 +862,7 @@ void trans_fundec_lab3(FunDef_ptr fundef)
         while(funfparam != nullptr)
         {
             //先记录参数信息
-            auto *param = trans_funfparam_lab3(funfparam);
+            auto *param = trans_funfparam(funfparam);
             if(param != nullptr)
                 params.push_back(param);
             if(param->Dimensions != 0)    //记录形参type

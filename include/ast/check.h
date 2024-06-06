@@ -12,34 +12,6 @@ using VarType_ptr = VarType *;
 struct FuncType;
 using FuncType_ptr = FuncType *;
 
-// struct VarType
-// {
-//     std::string ValID;
-//     int Dimensions;
-//     std::vector<int> DimensionSizes;
-
-//     Value *Val_Ptr;
-//     std::vector<std::optional<std::size_t>> Bounds;
-//     int Param_No;
-
-//     VarType(std::string valid, int dimensions, std::vector<int> dim_vec, Value *val_ptr = nullptr,  int param_no = 0) : 
-//     ValID(valid), Dimensions(dimensions), DimensionSizes(dim_vec), Val_Ptr(val_ptr),Param_No(param_no){
-//         if(Dimensions != 0){
-//             if (DimensionSizes.size() > 0) {
-
-//                 if(DimensionSizes[0] == 0)  //第一维是0，意味着这个数组变量是一个函数的数组形参
-//                     Bounds.push_back(std::nullopt);
-//                 else
-//                     Bounds.push_back(DimensionSizes[0]);
-            
-//             for(int i = 1; i < Dimensions; i++)
-//                 this->Bounds.push_back(DimensionSizes[i]);
-//         }
-//     }
-
-//     // VarType(std::string valid, int dimensions, std::vector<int> dim_vec) : ValID(valid), Dimensions(dimensions), DimensionSizes(dim_vec) {}
-// };
-
 struct VarType {
     std::string ValID;
     int Dimensions;
@@ -48,8 +20,8 @@ struct VarType {
     std::vector<std::optional<std::size_t>> Bounds;
     int Param_No;
 
-    VarType(std::string valid, int dimensions, std::vector<int> dim_vec, Value *val_ptr = nullptr, int param_no = 0) 
-        : ValID(valid), Dimensions(dimensions), DimensionSizes(dim_vec), Val_Ptr(val_ptr), Param_No(param_no) 
+    VarType(std::string valid, int dimensions, std::vector<int> dimensionsize, Value *val_ptr = nullptr, int param_no = 0) 
+        : ValID(valid), Dimensions(dimensions), DimensionSizes(dimensionsize), Val_Ptr(val_ptr), Param_No(param_no) 
     {
         if (Dimensions != 0) {
             if (DimensionSizes.size() > 0) {
@@ -58,10 +30,7 @@ struct VarType {
                 } else {
                     Bounds.push_back(DimensionSizes[0]);
                 }
-            } else {
-                return;
-            }
-
+            } 
             for (int i = 1; i < Dimensions; i++) {
                     Bounds.push_back(DimensionSizes[i]);
             }
