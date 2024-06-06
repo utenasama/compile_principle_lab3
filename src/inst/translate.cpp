@@ -12,7 +12,6 @@ PointerType *PtrIntType = PointerType::get(IntegerType);
 FunctionType *FT_main = FunctionType::get(IntegerType, {});
 Function *F_main = Function::Create(FT_main, false, "main", Module_main.get());
 BasicBlock *Entry_main = BasicBlock::Create(F_main);
-ConstantInt *Zero = ConstantInt::Create(0);
 BasicBlock *current_basic_block;
 
 //用于记录if while的数量，方便block命名
@@ -92,43 +91,36 @@ void add_func_to_table_(FuncType_ptr funcptr)
 
 Value* trans_funrparam(FunRParam_ptr funrparam)
 {
-    assert(funrparam != nullptr);
-    Value* res_value = trans_lor(funrparam->FirstParam);
-    return res_value;
+    return trans_lor(funrparam->FirstParam);
 }
 
 Value* trans_pmn_unaexpr(PMNUnaExpr_ptr pmn_unaexp)
 {
-    assert(pmn_unaexp != nullptr);
-    Value* res_value = trans_unaexp(pmn_unaexp->Operand);
 
-    //用0-val代替neg
     switch(pmn_unaexp->OP)
     {
         case OP_Lnot:
         {
-            return BinaryInst::CreateEq(res_value, Zero, IntegerType, current_basic_block);
+            Value* ret_value = trans_unaexp(pmn_unaexp->Operand);
+            return BinaryInst::CreateEq(ret_value, ConstantInt::Create(0), IntegerType, current_basic_block);
+            break;
         }
         case OP_Neg:
         {
-            return BinaryInst::CreateSub(Zero, res_value, IntegerType, current_basic_block);
+            Value* ret_value = trans_unaexp(pmn_unaexp->Operand);
+            return BinaryInst::CreateSub(ConstantInt::Create(0), ret_value, IntegerType, current_basic_block);
+            break;
         }
         case OP_Pos:
         {
-            return res_value;
-        }
-        default:
-        {
-            fmt::print("Error in trans_pmn_unaexpr, OP should be Neg / Pos / Lnot!\n");
-            error = 1;
-            return nullptr;
+            return trans_unaexp(pmn_unaexp->Operand);
+            break;
         }
     }
 }
-
+//TODO:
 Value* trans_func_unaexpr(FunUnaExpr_ptr func_unaexpr)
 {
-    assert(func_unaexpr != nullptr);
     std::vector<Value*> args;
     //先检查函数是否定义，再检查参数
     for(std::vector<std::map<std::string, FuncType_ptr>>::iterator iter = symbol_table_func_.end()-1; 
@@ -164,13 +156,11 @@ Value* trans_func_unaexpr(FunUnaExpr_ptr func_unaexpr)
 
 Value* trans_integer(Integer_ptr integer)
 {
-    assert(integer != nullptr);
     return ConstantInt::Create(integer->Val);
 }
-
+//TODO:
 Value* trans_lval(LVal_ptr lval)
 {
-    assert(lval != nullptr);
     //检查变量是否已经定义，以及维数是否正确
     int dimensions = 0;
     std::vector<Value*> Indices;
@@ -200,7 +190,7 @@ Value* trans_lval(LVal_ptr lval)
             while(dimensions < valptr->Dimensions)
             {
                 need_load = false;
-                Indices.push_back(Zero);
+                Indices.push_back(ConstantInt::Create(0));
                 dimensions++;
             }
             std::vector<std::optional<std::size_t>> Bounds = valptr->Bounds;
@@ -234,10 +224,9 @@ Value* trans_lval(LVal_ptr lval)
     fmt::print("Error in trans_lval, should not reach here\n");
     return nullptr;
 }
-
+//TODO
 Value* trans_lval_noload(LVal_ptr lval)
 {
-    assert(lval != nullptr);
     //检查变量是否已经定义，以及维数是否正确
     int dimensions = 0;
     std::vector<Value*> Indices;
@@ -265,7 +254,7 @@ Value* trans_lval_noload(LVal_ptr lval)
             //对于没有给定的维数，使用0，比如int a[2][3], a[1]的地址就是a[1][0]的地址
             while(dimensions < valptr->Dimensions)
             {
-                Indices.push_back(Zero);
+                Indices.push_back(ConstantInt::Create(0));
                 dimensions++;
             }
             std::vector<std::optional<std::size_t>> Bounds = valptr->Bounds;
@@ -298,66 +287,60 @@ Value* trans_lval_noload(LVal_ptr lval)
 
 Value* trans_prim_unaexpr(PrimExpr_ptr primexp)
 {
-    assert(primexp != nullptr);
     if(auto *lpexprp = primexp->as<LpExprRp_ptr>())
-    {   
         return trans_lor(lpexprp->Operand);
-    }
     else if(auto *integer = primexp->as<Integer_ptr>())
         return trans_integer(integer);
     else if(auto *lval = primexp->as<LVal_ptr>())
-    {   
-        Value *val_addr = trans_lval(lval);
-        return val_addr;   
-    }
-    else{
-        fmt::print("Error in trans_prim_unaexpr!!!!\n");
-        error = true;
-        return nullptr;
-    }
+        return trans_lval(lval);   
 }
 
 Value* trans_unaexp(UnaExpr_ptr unaexp)
 {
-    assert(unaexp != nullptr);
-    if(auto *pmn_unaexpr = unaexp->as<PMNUnaExpr_ptr>()){
+    if(auto *pmn_unaexpr = unaexp->as<PMNUnaExpr_ptr>())
         return trans_pmn_unaexpr(pmn_unaexpr);
-    }
     else if(auto *func_unaexpr = unaexp->as<FunUnaExpr_ptr>())
         return trans_func_unaexpr(func_unaexpr);
-    else{
-        auto *primexp = static_cast<PrimExpr_ptr>(unaexp);
-        return trans_prim_unaexpr(primexp);
-    }
+    else return trans_prim_unaexpr(static_cast<PrimExpr_ptr>(unaexp));
+
 }
 
 Value* trans_mulexp(MulExpr_ptr mulexp)
 {
-    assert(mulexp != nullptr);
-    if(mulexp->OP != OP_None)
-    {
-        Value* res_val1 = trans_mulexp(mulexp->Operand);
-        Value* res_val2 = trans_unaexp(mulexp->UnaExpr);
+    switch(mulexp->OP) {
+        case OP_None:
+        {
+            return trans_unaexp(mulexp->UnaExpr);
+        }
 
-        if(mulexp->OP == OP_Mul){
-            BinaryInst *Mul = BinaryInst::CreateMul(res_val1, res_val2, IntegerType, current_basic_block);
-            return Mul;
+        case OP_Mul:
+        {
+            return BinaryInst::CreateMul(
+                trans_mulexp(mulexp->Operand), 
+                trans_unaexp(mulexp->UnaExpr), 
+                IntegerType, 
+                current_basic_block
+            );
         }
-        else if(mulexp->OP == OP_Div){
-            BinaryInst *Div = BinaryInst::CreateDiv(res_val1, res_val2, IntegerType, current_basic_block);
-            return Div;
+        case OP_Div:
+        {
+            return BinaryInst::CreateDiv(
+                trans_mulexp(mulexp->Operand), 
+                trans_unaexp(mulexp->UnaExpr),
+                IntegerType,
+                current_basic_block
+            );
         }
-        else if(mulexp->OP == OP_Mod){
-            BinaryInst *Mod = BinaryInst::CreateMod(res_val1, res_val2, IntegerType, current_basic_block);
-            return Mod;
+        case OP_Mod:
+        {
+            return BinaryInst::CreateMod(
+                trans_mulexp(mulexp->Operand), 
+                trans_unaexp(mulexp->UnaExpr), 
+                IntegerType, 
+                current_basic_block
+            );
         }
-        else{
-            error = true;
-            fmt::print("Error in trans_mulexp, operand should be Mul / Div!!\n");
-            return nullptr;
-        }
-    }else
-        return trans_unaexp(mulexp->UnaExpr);
+    }
 }
 
 Value* trans_addexp(AddExpr_ptr addexp)
@@ -966,7 +949,6 @@ void trans_fundec_lab3(FunDef_ptr fundef)
 
         count++;
     }
-    //TODO:
     trans_block(fundef->Block, nullptr, nullptr);
     pop_symbol_table_();
 }
