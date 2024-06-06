@@ -17,13 +17,6 @@ Function *Function_main = Function::Create(
 BasicBlock *Entry_main = BasicBlock::Create(Function_main);
 BasicBlock *current_basic_block;
 
-//用于记录if while的数量，方便block命名
-int if_count = 0;
-int while_count = 0;
-int block_count = 0;
-//用于记录if while中的lor/land操作，方便shortcut block命名
-int lor_count = 0;
-int land_count = 0;
 bool cur_bb_has_term = false;
 
 void push_symbol_table_()  //加入一个新的符号表
@@ -614,9 +607,7 @@ Value* trans_lor_shortcut(LOr_ptr lor, BasicBlock *true_bb, BasicBlock *false_bb
         BasicBlock *lor_con1_false_bb = BasicBlock::Create(current_basic_block->getParent());
         Value* res_val1 = trans_land_shortcut(lor->LAnd, true_bb, lor_con1_false_bb);
         current_basic_block = lor_con1_false_bb;
-        // lor_count++;
-        // block_count++;
-        // cur_bb_has_term = false;
+
         return trans_lor_shortcut(lor->Operand, true_bb, false_bb);
     }else{
         return trans_land_shortcut(lor->LAnd, true_bb, false_bb);
@@ -633,10 +624,6 @@ Value* trans_land_shortcut(LAnd_ptr land, BasicBlock *true_bb, BasicBlock *false
         BranchInst *Br = BranchInst::Create(land_con1_true_bb, false_bb, res_val1, current_basic_block);
 
         current_basic_block = land_con1_true_bb;
-        // land_count++;
-
-        // cur_bb_has_term = false;
-        // block_count++;
 
         return trans_land_shortcut(land->Operand, true_bb, false_bb);
     }else{
@@ -887,7 +874,6 @@ void trans_fundec(FunDef_ptr fundef)
     push_symbol_table_();
     current_basic_block = Entry;
     cur_bb_has_term = false;
-    block_count++;
     //函数的参数属于自己的那个作用域，顺便为所有形参加上名字
     int count = 0;
     for(auto *ele : params)
