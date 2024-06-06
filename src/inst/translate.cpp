@@ -611,9 +611,9 @@ Value* trans_lor_shortcut(LOr_ptr lor, BasicBlock *true_bb, BasicBlock *false_bb
         BasicBlock *lor_con1_false_bb = BasicBlock::Create(current_basic_block->getParent());
         Value* res_val1 = trans_land_shortcut(lor->LAnd, true_bb, lor_con1_false_bb);
         current_basic_block = lor_con1_false_bb;
-        lor_count++;
-        block_count++;
-        cur_bb_has_term = false;
+        // lor_count++;
+        // block_count++;
+        // cur_bb_has_term = false;
         return trans_lor_shortcut(lor->Operand, true_bb, false_bb);
     }else{
         return trans_land_shortcut(lor->LAnd, true_bb, false_bb);
@@ -630,21 +630,18 @@ Value* trans_land_shortcut(LAnd_ptr land, BasicBlock *true_bb, BasicBlock *false
         BranchInst *Br = BranchInst::Create(land_con1_true_bb, false_bb, res_val1, current_basic_block);
 
         current_basic_block = land_con1_true_bb;
-        land_count++;
+        // land_count++;
 
-        cur_bb_has_term = false;
-        block_count++;
+        // cur_bb_has_term = false;
+        // block_count++;
 
         return trans_land_shortcut(land->Operand, true_bb, false_bb);
     }else{
         if(land->Eq->Operand == nullptr && land->Eq->Rel->Operand == nullptr &&
             land->Eq->Rel->Expr->Operand == nullptr && land->Eq->Rel->Expr->MulExpr->Operand == nullptr)
         {
-            auto *unaexp = land->Eq->Rel->Expr->MulExpr->UnaExpr;
-            if(auto *lpexprp = unaexp->as<LpExprRp_ptr>())
-            {
+            if(auto *lpexprp = land->Eq->Rel->Expr->MulExpr->UnaExpr->as<LpExprRp_ptr>())
                 return trans_lor_shortcut(lpexprp->Operand, true_bb, false_bb);
-            }
         }
 
         Value* res_value = trans_eq(land->Eq);
@@ -657,20 +654,26 @@ Value* trans_land_shortcut(LAnd_ptr land, BasicBlock *true_bb, BasicBlock *false
 
 Value* trans_eq(Eq_ptr eq)
 {
-    assert(eq != nullptr);
     if(eq->Operand != nullptr)
     {
-        Value* res_val1 = trans_eq(eq->Operand);
-        Value* res_val2 = trans_rel(eq->Rel);
-     
-        if(eq->OP == OP_Eq)
-            return BinaryInst::CreateEq(res_val1, res_val2, IntegerType, current_basic_block);
-        else if(eq->OP == OP_Ne)
-            return BinaryInst::CreateNe(res_val1, res_val2, IntegerType, current_basic_block);
-        else{
-            error = true;
-            fmt::print("Error in trans_eq, operand should be Eq / Ne!!\n");
-            return nullptr;
+        switch(eq->OP)
+        {
+            case OP_Eq:
+                return BinaryInst::CreateEq(
+                    trans_eq(eq->Operand), 
+                    trans_rel(eq->Rel), 
+                    IntegerType, 
+                    current_basic_block
+                );
+                break;
+            case OP_Ne:
+                return BinaryInst::CreateNe(
+                    trans_eq(eq->Operand), 
+                    trans_rel(eq->Rel), 
+                    IntegerType, 
+                    current_basic_block
+                );
+                break;
         }
     }else
         return trans_rel(eq->Rel);
@@ -678,43 +681,60 @@ Value* trans_eq(Eq_ptr eq)
 
 Value* trans_rel(Rel_ptr rel)
 {
-    assert(rel != nullptr);
     if(rel->Operand != nullptr)
     {
-        Value* res_val1 = trans_rel(rel->Operand);
-        Value* res_val2 = trans_addexp(rel->Expr);
-
-        if(rel->OP == OP_Lt)
-            return BinaryInst::CreateLt(res_val1, res_val2, IntegerType, current_basic_block);
-        else if(rel->OP == OP_Gt)
-            return BinaryInst::CreateGt(res_val1, res_val2, IntegerType, current_basic_block);
-        else if(rel->OP == OP_Le)
-            return BinaryInst::CreateLe(res_val1, res_val2, IntegerType, current_basic_block);
-        else if(rel->OP == OP_Ge)
-            return BinaryInst::CreateGe(res_val1, res_val2, IntegerType, current_basic_block);
-        else{
-            error = true;
-            fmt::print("Error in trans_rel, operand should be Lt / Gt / Le / Ge!!\n");
-            return nullptr;
+        switch(rel->OP)
+        {
+            case OP_Lt:
+                return BinaryInst::CreateLt(
+                    trans_rel(rel->Operand), 
+                    trans_addexp(rel->Expr), 
+                    IntegerType, 
+                    current_basic_block
+                );
+                break;
+            case OP_Gt:
+                return BinaryInst::CreateGt(
+                    trans_rel(rel->Operand), 
+                    trans_addexp(rel->Expr), 
+                    IntegerType, 
+                    current_basic_block
+                );
+                break;
+            case OP_Le:
+                return BinaryInst::CreateLe(
+                    trans_rel(rel->Operand), 
+                    trans_addexp(rel->Expr), 
+                    IntegerType, 
+                    current_basic_block
+                );
+                break;
+            case OP_Ge:
+                return BinaryInst::CreateGe(
+                    trans_rel(rel->Operand), 
+                    trans_addexp(rel->Expr), 
+                    IntegerType, 
+                    current_basic_block
+                );
+                break;
+            default:
+                error = true;
+                fmt::print("Error in trans_rel, operand should be Lt / Gt / Le / Ge!!\n");
+                return nullptr;
         }
     }else{
         return trans_addexp(rel->Expr);
     }
 }
-
+//TODO
 void trans_whilestmt(WhileStmt_ptr whilestmt)
 {
-    assert(whilestmt != nullptr);
-
-    while_count++;
-    lor_count = 0;
-    land_count = 0;
 
     BasicBlock *Body = BasicBlock::Create(current_basic_block->getParent());
     BasicBlock *Entry = BasicBlock::Create(current_basic_block->getParent());
     BasicBlock *Exit = BasicBlock::Create(current_basic_block->getParent());
 
-    //先插入一条jump到当前block，跳转到entry
+    //插一条jump到当前block 跳转到entry
     if(!cur_bb_has_term){
         JumpInst *JTE = JumpInst::Create(Entry, current_basic_block);
         cur_bb_has_term = true;
@@ -722,14 +742,11 @@ void trans_whilestmt(WhileStmt_ptr whilestmt)
 
     //下面开始翻译
     current_basic_block = Entry;
-    cur_bb_has_term = false;
-    block_count++;
-
     Value* res_value = trans_lor_shortcut(whilestmt->Cond, Body, Exit);  //如果不等于0，就是true
 
     current_basic_block = Body;
     cur_bb_has_term = false;
-    block_count++;
+
     trans_stmt(whilestmt->WhileBody, Entry, Exit);
     if(!cur_bb_has_term)
     {
@@ -739,16 +756,11 @@ void trans_whilestmt(WhileStmt_ptr whilestmt)
 
     current_basic_block = Exit;
     cur_bb_has_term = false;
-    block_count++;
-}
 
+}
+//TODO
 void trans_ifstmt(IfStmt_ptr ifstmt, BasicBlock *entry, BasicBlock *exit)
 {
-    assert(ifstmt != nullptr);
-    
-    if_count++;
-    lor_count = 0;
-    land_count = 0;
     
     BasicBlock *True = BasicBlock::Create(current_basic_block->getParent());
     BasicBlock *False = nullptr;
@@ -766,7 +778,6 @@ void trans_ifstmt(IfStmt_ptr ifstmt, BasicBlock *entry, BasicBlock *exit)
     {   
         current_basic_block = True;
         cur_bb_has_term = false;
-        block_count++;
         trans_stmt(ifstmt->IfBody, entry, exit);
         if(!cur_bb_has_term){
             JumpInst::Create(Exit_If, current_basic_block);
@@ -774,43 +785,25 @@ void trans_ifstmt(IfStmt_ptr ifstmt, BasicBlock *entry, BasicBlock *exit)
         }
         current_basic_block = False;
         cur_bb_has_term = false;
-        block_count++;
         trans_stmt(ifstmt->ElseBody, entry, exit);
-        if(!cur_bb_has_term){
-            JumpInst::Create(Exit_If, current_basic_block);
-            cur_bb_has_term = true;
-        }
     }else{
         current_basic_block = True;
         cur_bb_has_term = false;
-        block_count++;
         trans_stmt(ifstmt->IfBody, entry, exit);
-        if(!cur_bb_has_term){
-            JumpInst::Create(Exit_If, current_basic_block);
-            cur_bb_has_term = true;
-        }
+    }
+    if(!cur_bb_has_term){
+        JumpInst::Create(Exit_If, current_basic_block);
+        cur_bb_has_term = true;
     }
     current_basic_block = Exit_If;
     cur_bb_has_term = false;
-    block_count++;
 }
 
-void trans_emptystmt(EmptyStmt_ptr emptystmt)
-{
-    assert(emptystmt != nullptr);
-}
 
 void trans_stmt(Stmt_ptr stmt, BasicBlock *entry, BasicBlock *exit)
 {
-    assert(stmt != nullptr);
-    if(auto *lvalstmt = stmt->as<LValStmt_ptr>())
-        trans_lvalstmt(lvalstmt);
-    else if(auto *retstmt = stmt->as<RetStmt_ptr>())
-        trans_retstmt(retstmt);
-    else if(auto *expstmt = stmt->as<ExpStmt_ptr>())
+    if(auto *expstmt = stmt->as<ExpStmt_ptr>())
         trans_expstmt(expstmt);
-    else if(auto *breakstmt = stmt->as<BreakStmt_ptr>())
-        trans_breakstmt(breakstmt, exit);
     else if(auto *contistmt = stmt->as<ContiStmt_ptr>())
         trans_contistmt(contistmt, entry);
     else if(auto *blockinstmt = stmt->as<BlockInStmt_ptr>())
@@ -819,17 +812,16 @@ void trans_stmt(Stmt_ptr stmt, BasicBlock *entry, BasicBlock *exit)
         trans_ifstmt(ifstmt, entry, exit);
     else if(auto *whilestmt = stmt->as<WhileStmt_ptr>())
         trans_whilestmt(whilestmt);
-    else if(auto *emptystmt = stmt->as<EmptyStmt_ptr>())
-        trans_emptystmt(emptystmt);
-    else{
-        fmt::print("error in function trans_stmt!\n");
-        error = true;
-    }
+    else if(auto *lvalstmt = stmt->as<LValStmt_ptr>())
+        trans_lvalstmt(lvalstmt);
+    else if(auto *retstmt = stmt->as<RetStmt_ptr>())
+        trans_retstmt(retstmt);
+    else if(auto *breakstmt = stmt->as<BreakStmt_ptr>())
+        trans_breakstmt(breakstmt, exit);
 }
 
 void trans_blockitem(BlockItem_ptr blockitem, BasicBlock *entry, BasicBlock *exit)
 {
-    assert(blockitem != nullptr);
     if(auto *valdecitem = blockitem->as<ValDecItem_ptr>())
         trans_valdecitem(valdecitem);
     else if(auto *stmtitem = blockitem->as<StmtItem_ptr>())
@@ -837,23 +829,16 @@ void trans_blockitem(BlockItem_ptr blockitem, BasicBlock *entry, BasicBlock *exi
 }
 
 void trans_block(Block_ptr block, BasicBlock *entry, BasicBlock *exit)
-{
-    assert(block != nullptr);
-    if(block->BlockItemHead != nullptr)
-    {   
-        auto *blockitem = block->BlockItemHead;
-        while(blockitem != nullptr)
-        {
-            trans_blockitem(blockitem, entry, exit);
-            blockitem = blockitem->NextBlockItem;
-        }
+{  
+    for(auto *blockitem = block->BlockItemHead; blockitem != nullptr; blockitem = blockitem->NextBlockItem)
+    {
+        trans_blockitem(blockitem, entry, exit);
     }
 }
 
-//具体打印函数信息
-void trans_fundec_lab3(FunDef_ptr fundef)
+//TODO
+void trans_fundec(FunDef_ptr fundef)
 {
-    assert(fundef != nullptr);
     std::vector<VarType_ptr> params;
     std::vector<Type *> Params_lab3;
     if(fundef->FunFParam != nullptr)
@@ -922,65 +907,57 @@ void trans_fundec_lab3(FunDef_ptr fundef)
 }
 
 
-//翻译变量声明
+
 void trans_compunit_valdec(CompUnitValDec_ptr compunit_valdec)
 {
-    assert(compunit_valdec != nullptr);
-
-    auto *valdec = compunit_valdec->ValDec;
-    //逐个翻译
-    while(valdec != nullptr)
+    for(auto *valdec = compunit_valdec->ValDec; 
+        valdec != nullptr; 
+        valdec = valdec->NextValDec)
     {
         trans_valdec_global(valdec);
-        valdec = valdec->NextValDec;
     }
 }
 
 
-//打印函数声明
 void trans_compunit_fundec(CompUnitFunDec_ptr compunit_fundec)
 {
-    assert(compunit_fundec != nullptr);
-
-    //具体打印函数信息
-    trans_fundec_lab3(compunit_fundec->FunDef);
+    trans_fundec(compunit_fundec->FunDef);
 }
 
 
 
 void trans_compunit(CompUnit_ptr compunit)
 {
-    assert(compunit != nullptr);
 
-    //lab2 根据compunit中语句的具体类型(函数声明 变量声明)进一步打印
-    //lab3和lab2的区别，需要先进行全局变量的翻译，再进行函数的翻译
+    //lab3要先对全局变量翻译，然后翻译函数
     std::vector<CompUnitFunDec_ptr> functiondec_vec;
-    //这里会主动设置main的basicblock
-    while(compunit != nullptr)
+
+    for(auto *curr_compunit = compunit; curr_compunit != nullptr; curr_compunit = curr_compunit->NextCompUnit)
     {
-        if(auto *compunit_valdec = compunit->as<CompUnitValDec_ptr>())
+        if(auto *compunit_valdec = curr_compunit->as<CompUnitValDec_ptr>())
+        {
             trans_compunit_valdec(compunit_valdec);
-        else if(auto *compunit_fundec = compunit->as<CompUnitFunDec_ptr>())
-            functiondec_vec.push_back(compunit_fundec);
+        }
+        else if(auto *compunit_fundec = curr_compunit->as<CompUnitFunDec_ptr>())
+        {
+            functiondec_vec.emplace_back(compunit_fundec);
+        }
         else
+        {
             fmt::print("Error in function trans_compunit\n");
-
-        compunit = compunit->NextCompUnit;
+        }
     }
-
-    //然后翻译函数
+    //函数翻译
     for(auto compunit_fundec : functiondec_vec)
+    {
         trans_compunit_fundec(compunit_fundec);
+    }
 }
 
 
-
-//打印root
 void trans_root(Root_ptr root, std::ostream & out)
 {
-    assert(root != nullptr);
     push_symbol_table_();
-
     //加入运行时函数到最外层作用域之中
     auto scope = symbol_table_func_.begin();
     //putint
