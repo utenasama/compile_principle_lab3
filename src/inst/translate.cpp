@@ -353,7 +353,7 @@ void trans_valdec_global(ValDec_ptr valdec)
         if (valdec->ExpArr != nullptr)
             error = true;
         Value *init_val = trans_initval(valdec->InitVal);
-        StoreInst *ValInit = StoreInst::Create(init_val, val_addr, Entry_main); // 所有的全局变量赋值语句，都放到main中
+        StoreInst *ValInit = StoreInst::Create(init_val, val_addr, Entry_main); 
     }
 
     auto *variable = new VarType(valdec->ID, dimensions, dimensionsizes, val_addr);
@@ -373,10 +373,10 @@ VarType_ptr trans_funfparam(FunFParam_ptr funfparam)
         return integerExpr->Val;
     };
 
-    // 如果形式参数是一个数组，需要检查维度
+   
     if (funfparam->IsArr)
     {
-        dimensionCount++; // 如果形式参数是数组，第一维是空的，且在语法分析时不会被视为一个 ExpArr
+        dimensionCount++; 
         dimensionSizes.push_back(0);
         if (funfparam->ExpArr != nullptr)
         {
@@ -385,7 +385,6 @@ VarType_ptr trans_funfparam(FunFParam_ptr funfparam)
                 int dimensionSize = extractDimensionSize(expArr);
                 dimensionCount++;
                 dimensionSizes.push_back(dimensionSize);
-                // 函数形式参数不需要分配存储空间，所以不需要计算总大小
             }
         }
     }
@@ -561,30 +560,26 @@ void trans_whilestmt(WhileStmt_ptr whilestmt)
     BasicBlock *BodyBlock = BasicBlock::Create(parentFunction);
     BasicBlock *ExitBlock = BasicBlock::Create(parentFunction);
 
-    // 如果当前块没有终止指令，则插入跳转到 EntryBlock 的指令
+
     if (!hasTerminator)
     {
         JumpInst::Create(EntryBlock, current_basic_block);
         hasTerminator = true;
     }
 
-    // 设置当前块为 EntryBlock，并翻译条件表达式
     current_basic_block = EntryBlock;
     Value *cond_value = trans_lor_shortcut(whilestmt->Cond, BodyBlock, ExitBlock);
 
-    // 设置当前块为 BodyBlock，并翻译循环体
     current_basic_block = BodyBlock;
     hasTerminator = false;
     trans_stmt(whilestmt->WhileBody, EntryBlock, ExitBlock);
 
-    // 如果当前块没有终止指令，则插入跳转到 EntryBlock 的指令
     if (!hasTerminator)
     {
         JumpInst::Create(EntryBlock, current_basic_block);
         hasTerminator = true;
     }
 
-    // 设置当前块为 ExitBlock，表示循环结束部分
     current_basic_block = ExitBlock;
     hasTerminator = false;
 }
@@ -687,7 +682,6 @@ void trans_fundec(FunDef_ptr fundef)
     std::vector<Type *> Params_lab3;
     trans_params(fundef, params, Params_lab3);
 
-    // 设置返回类型
     Type *ret_type = (fundef->RType == Ret_Int) ? Type::getIntegerTy() : Type::getUnitTy();
 
     BasicBlock *Entry;
@@ -728,7 +722,6 @@ void trans_params(FunDef_ptr fundef, std::vector<VarType_ptr>& params, std::vect
         auto *funfparam = fundef->FunFParam;
         while (funfparam != nullptr)
         {
-            // 记录参数信息
             auto *param = trans_funfparam(funfparam);
             if (param != nullptr)
                 params.push_back(param);
@@ -788,7 +781,6 @@ void trans_root(Root_ptr root, std::ostream &out)
 {
     push_symbol_table_();
     
-    // 加入运行时函数到最外层作用域之中
     auto scope = symbol_table_func_.begin();
 
     // getint
@@ -823,7 +815,7 @@ void trans_root(Root_ptr root, std::ostream &out)
     FunctionType *FT_putch = FunctionType::get(Type::getUnitTy(), {Type::getIntegerTy()});
     Function *F_putch = Function::Create(FT_putch, true, "putch", Module_main.get());
     std::vector<VarType_ptr> params_putch;
-    auto param_putch = new VarType("_", 0, {}); // 这里因为不会编译putint的函数定义，所以形参叫什么都无所谓
+    auto param_putch = new VarType("_", 0, {}); 
     params_putch.push_back(param_putch);
     fp = new FuncType("putch", Ret_Void, params_putch, F_putch);
     scope->insert(std::pair<std::string, FuncType_ptr>("putch",fp));
